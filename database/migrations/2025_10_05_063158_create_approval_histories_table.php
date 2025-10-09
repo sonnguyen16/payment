@@ -19,11 +19,11 @@ return new class extends Migration
             $table->string('from_status', 50)->nullable();
             $table->string('to_status', 50)->nullable();
             $table->text('reason')->nullable();
-            $table->json('changes')->nullable();
+            $table->text('changes')->nullable();
             $table->string('ip_address', 45)->nullable();
             $table->string('user_agent')->nullable();
             $table->timestamp('created_at');
-            
+
             $table->index('payment_request_id');
             $table->index('user_id');
             $table->index('action');
