@@ -72,6 +72,11 @@ class PaymentRequest extends Model
         return $this->belongsTo(Category::class);
     }
 
+    public function details(): HasMany
+    {
+        return $this->hasMany(PaymentRequestDetail::class);
+    }
+
     // Scopes
     public function scopePending(Builder $query): Builder
     {

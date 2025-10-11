@@ -176,8 +176,7 @@
                 <td class="label">Nguồn tiền:</td>
                 <td style="padding-right: 200px;">
                     <span style="float: right;">
-                        <strong>Mã số:</strong> {{ $request->payment_code ?? 'FIN' . str_pad($request->id, 3, '0',
-                        STR_PAD_LEFT) }}
+                        <strong>Mã số:</strong> {{ $request->payment_code ?? "" }}
                     </span>
                 </td>
             </tr>
@@ -200,6 +199,18 @@
             </tr>
         </thead>
         <tbody>
+            @if($request->details && count($request->details) > 0)
+            @foreach($request->details as $index => $detail)
+            <tr>
+                <td>{{ $index + 1 }}</td>
+                <td class="description">{{ $detail->description }}</td>
+                <td class="amount">{{ number_format($detail->amount_before_tax, 0, ',', '.') }}</td>
+                <td class="amount">{{ number_format($detail->tax_amount, 0, ',', '.') }}</td>
+                <td class="amount">{{ number_format($detail->total_amount, 0, ',', '.') }}</td>
+                <td>{{ $detail->invoice_number ?? '-' }}</td>
+            </tr>
+            @endforeach
+            @else
             <tr>
                 <td>1</td>
                 <td class="description">{{ $request->description }}</td>
@@ -208,6 +219,7 @@
                 <td class="amount">{{ number_format($request->amount, 0, ',', '.') }}</td>
                 <td>-</td>
             </tr>
+            @endif
             <tr class="total-row">
                 <td colspan="4" style="text-align: center;"><strong>TỔNG</strong></td>
                 <td class="amount"><strong>{{ number_format($request->amount, 0, ',', '.') }}</strong></td>

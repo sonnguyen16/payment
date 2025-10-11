@@ -15,10 +15,24 @@ class PaymentRequestService
     public function create(array $data): PaymentRequest
     {
         return DB::transaction(function () use ($data) {
+            // Extract details before creating payment request
+            $details = $data['details'];
+            unset($data['details']);
+            
+            // Calculate total amount from details
+            $totalAmount = collect($details)->sum('total_amount');
+            $data['amount'] = $totalAmount;
+            $data['description'] = collect($details)->pluck('description')->join('; ');
+            
             $data['status'] = PaymentRequestStatus::DRAFT;
             $data['user_id'] = auth()->id();
             
             $paymentRequest = PaymentRequest::create($data);
+            
+            // Create details
+            foreach ($details as $detail) {
+                $paymentRequest->details()->create($detail);
+            }
             
             event(new PaymentRequestCreated($paymentRequest));
             
@@ -29,6 +43,15 @@ class PaymentRequestService
     public function update(PaymentRequest $paymentRequest, array $data, string $reason): PaymentRequest
     {
         return DB::transaction(function () use ($paymentRequest, $data, $reason) {
+            // Extract details before updating payment request
+            $details = $data['details'];
+            unset($data['details']);
+            
+            // Calculate total amount from details
+            $totalAmount = collect($details)->sum('total_amount');
+            $data['amount'] = $totalAmount;
+            $data['description'] = collect($details)->pluck('description')->join('; ');
+            
             $changes = [];
             foreach ($data as $key => $value) {
                 if ($paymentRequest->{$key} != $value) {
@@ -41,6 +64,12 @@ class PaymentRequestService
             }
             
             $paymentRequest->update($data);
+            
+            // Update details - delete old ones and create new ones
+            $paymentRequest->details()->delete();
+            foreach ($details as $detail) {
+                $paymentRequest->details()->create($detail);
+            }
             
             event(new PaymentRequestUpdated($paymentRequest, $changes, $reason));
             

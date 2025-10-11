@@ -51,15 +51,15 @@ class PaymentRequestController extends Controller
             // Mặc định không hiển thị phiếu cancelled và deleted
             $query->whereNotIn('status', ['cancelled', 'deleted']);
         }
-        
+
         if ($request->priority) {
             $query->where('priority', $request->priority);
         }
-        
+
         if ($request->type) {
             $query->where('type', $request->type);
         }
-        
+
         if ($request->search) {
             $query->where(function($q) use ($request) {
                 $q->where('description', 'like', "%{$request->search}%")
@@ -116,6 +116,7 @@ class PaymentRequestController extends Controller
             'project',
             'currentApprover',
             'category',
+            'details',
             'documents.uploader',
             'approvalHistories.user'
         ]);
@@ -138,6 +139,8 @@ class PaymentRequestController extends Controller
     public function edit(PaymentRequest $paymentRequest)
     {
         $this->authorize('update', $paymentRequest);
+
+        $paymentRequest->load('details');
 
         return Inertia::render('PaymentRequests/Edit', [
             'request' => $paymentRequest,
@@ -230,7 +233,7 @@ class PaymentRequestController extends Controller
         ]);
 
         $filename = 'phieu-de-xuat-' . $paymentRequest->id . '.pdf';
-        
+
         return $pdf->stream($filename);
     }
 }

@@ -17,14 +17,26 @@ class OfficeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $offices = Office::withCount(['departments', 'users'])
-            ->orderBy('name')
-            ->paginate(20);
+        $query = Office::withCount(['departments', 'users']);
+
+        // Filter by search
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('location', 'like', "%{$search}%");
+            });
+        }
+
+        $offices = $query->orderBy('name')->paginate(20);
 
         return Inertia::render('Admin/Offices/Index', [
             'offices' => $offices,
+            'filters' => [
+                'search' => $request->search,
+            ],
         ]);
     }
 

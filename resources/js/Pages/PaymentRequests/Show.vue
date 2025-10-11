@@ -220,12 +220,8 @@ const canUpdate = computed(() => {
                     </td>
                   </tr>
                   <tr>
-                    <th>Số tiền</th>
+                    <th>Tổng số tiền</th>
                     <td class="text-danger font-weight-bold">{{ formatMoney(request.amount) }}</td>
-                  </tr>
-                  <tr>
-                    <th>Mô tả</th>
-                    <td>{{ request.description }}</td>
                   </tr>
                   <tr>
                     <th>Lý do</th>
@@ -268,6 +264,48 @@ const canUpdate = computed(() => {
                     <td>{{ formatDateTime(request.paid_at) }}</td>
                   </tr>
                 </table>
+              </div>
+            </div>
+
+            <!-- Chi tiết thanh toán -->
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Chi tiết thanh toán</h3>
+              </div>
+              <div class="card-body p-0">
+                <table class="table" v-if="request.details && request.details.length > 0">
+                  <thead>
+                    <tr>
+                      <th style="width: 50px">STT</th>
+                      <th>Nội dung</th>
+                      <th style="width: 150px">Số tiền chưa thuế</th>
+                      <th style="width: 120px">Thuế GTGT</th>
+                      <th style="width: 150px">Tổng tiền</th>
+                      <th style="width: 120px">Số hóa đơn</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(detail, index) in request.details" :key="detail.id">
+                      <td class="text-center">{{ index + 1 }}</td>
+                      <td>{{ detail.description }}</td>
+                      <td class="text-right">{{ formatMoney(detail.amount_before_tax) }}</td>
+                      <td class="text-right">{{ formatMoney(detail.tax_amount) }}</td>
+                      <td class="text-right font-weight-bold">{{ formatMoney(detail.total_amount) }}</td>
+                      <td>{{ detail.invoice_number || '-' }}</td>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr class="bg-light">
+                      <th colspan="4" class="text-right">Tổng cộng:</th>
+                      <th class="text-right text-danger">{{ formatMoney(request.amount) }}</th>
+                      <th></th>
+                    </tr>
+                  </tfoot>
+                </table>
+                <div v-else class="text-center p-4 text-muted">
+                  <i class="fas fa-inbox fa-2x mb-2"></i>
+                  <p>Không có chi tiết thanh toán</p>
+                </div>
               </div>
             </div>
 
@@ -348,7 +386,7 @@ const canUpdate = computed(() => {
             </div>
 
             <!-- Upload Documents (After Paid) -->
-            <div class="card" v-if="request.status === 'paid' && usePage().props.auth.user.id === request.user_id">
+            <div class="card" v-if="usePage().props.auth.user.id === request.user_id">
               <div class="card-header bg-success">
                 <h3 class="card-title"><i class="fas fa-upload"></i> Upload chứng từ</h3>
               </div>

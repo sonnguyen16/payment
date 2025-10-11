@@ -18,14 +18,41 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::with(['roles', 'office', 'department'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
+        $query = User::with(['roles', 'office', 'department']);
+
+        // Filter by search
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter by role
+        if ($request->filled('role')) {
+            $query->whereHas('roles', function($q) use ($request) {
+                $q->where('name', $request->role);
+            });
+        }
+
+        // Filter by office
+        if ($request->filled('office_id')) {
+            $query->where('office_id', $request->office_id);
+        }
+
+        $users = $query->orderBy('created_at', 'desc')->paginate(20);
 
         return Inertia::render('Admin/Users/Index', [
             'users' => $users,
+            'offices' => \App\Models\Office::all(),
+            'filters' => [
+                'search' => $request->search,
+                'role' => $request->role,
+                'office_id' => $request->office_id,
+            ],
         ]);
     }
 

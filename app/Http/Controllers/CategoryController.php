@@ -22,12 +22,32 @@ class CategoryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $categories = Category::orderBy('name')->paginate(20);
+        $query = Category::withCount('paymentRequests');
+
+        // Filter by search
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter by status
+        if ($request->filled('is_active')) {
+            $query->where('is_active', $request->is_active === 'active');
+        }
+
+        $categories = $query->orderBy('name')->paginate(20);
 
         return Inertia::render('Categories/Index', [
             'categories' => $categories,
+            'filters' => [
+                'search' => $request->search,
+                'is_active' => $request->is_active,
+            ],
         ]);
     }
 
@@ -76,6 +96,8 @@ class CategoryController extends Controller
      */
     public function edit(Category $category)
     {
+        $category->loadCount('paymentRequests');
+        
         return Inertia::render('Categories/Edit', [
             'category' => $category,
         ]);

@@ -10,14 +10,58 @@ const props = defineProps({
 
 const form = useForm({
   category_id: props.request.category_id || '',
-  amount: props.request.amount,
-  description: props.request.description,
   reason: props.request.reason,
   expected_date: props.request.expected_date.split('T')[0],
   priority: props.request.priority,
   project_id: props.request.project_id || '',
+  details:
+    props.request.details && props.request.details.length > 0
+      ? props.request.details.map((detail) => ({
+          description: detail.description,
+          amount_before_tax: detail.amount_before_tax,
+          tax_amount: detail.tax_amount,
+          total_amount: detail.total_amount,
+          invoice_number: detail.invoice_number || ''
+        }))
+      : [
+          {
+            description: props.request.description || '',
+            amount_before_tax: props.request.amount || '',
+            tax_amount: 0,
+            total_amount: props.request.amount || '',
+            invoice_number: ''
+          }
+        ],
   update_reason: ''
 })
+
+const addDetail = () => {
+  form.details.push({
+    description: '',
+    amount_before_tax: '',
+    tax_amount: 0,
+    total_amount: '',
+    invoice_number: ''
+  })
+}
+
+const removeDetail = (index) => {
+  if (form.details.length > 1) {
+    form.details.splice(index, 1)
+  }
+}
+
+const calculateTotal = (detail) => {
+  const beforeTax = parseFloat(detail.amount_before_tax) || 0
+  const tax = parseFloat(detail.tax_amount) || 0
+  detail.total_amount = beforeTax + tax
+}
+
+const getTotalAmount = () => {
+  return form.details.reduce((sum, detail) => {
+    return sum + (parseFloat(detail.total_amount) || 0)
+  }, 0)
+}
 
 const submit = () => {
   form.put(route('payment-requests.update', props.request.id))
@@ -28,19 +72,12 @@ const submit = () => {
   <Head title="Chỉnh sửa phiếu" />
 
   <AdminLayout>
-    <div class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1 class="m-0">Chỉnh sửa phiếu #{{ request.id }}</h1>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="content">
+    <div class="content pt-3">
       <div class="container-fluid">
         <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Chỉnh sửa phiếu #{{ request.id }}</h3>
+          </div>
           <form @submit.prevent="submit">
             <div class="card-body">
               <div class="alert alert-info">
@@ -51,7 +88,11 @@ const submit = () => {
                 <div class="col-md-6">
                   <div class="form-group">
                     <label>Danh mục <span class="text-danger">*</span></label>
-                    <select v-model="form.category_id" class="form-control" :class="{ 'is-invalid': form.errors.category_id }">
+                    <select
+                      v-model="form.category_id"
+                      class="form-control"
+                      :class="{ 'is-invalid': form.errors.category_id }"
+                    >
                       <option value="">-- Chọn danh mục --</option>
                       <option v-for="category in categories" :key="category.id" :value="category.id">
                         {{ category.name }}
@@ -62,38 +103,117 @@ const submit = () => {
                 </div>
                 <div class="col-md-6">
                   <div class="form-group">
-                    <label>Số tiền (VNĐ) <span class="text-danger">*</span></label>
+                    <label>Tổng số tiền (VNĐ)</label>
                     <input
-                      v-model="form.amount"
-                      type="number"
+                      :value="getTotalAmount().toLocaleString('vi-VN')"
+                      type="text"
                       class="form-control"
-                      :class="{ 'is-invalid': form.errors.amount }"
+                      readonly
                     />
-                    <div v-if="form.errors.amount" class="invalid-feedback">{{ form.errors.amount }}</div>
+                    <small class="text-muted">Tự động tính từ chi tiết bên dưới</small>
                   </div>
                 </div>
               </div>
 
-              <div class="form-group">
-                <label>Mô tả <span class="text-danger">*</span></label>
-                <textarea
-                  v-model="form.description"
-                  class="form-control"
-                  :class="{ 'is-invalid': form.errors.description }"
-                  rows="3"
-                ></textarea>
-                <div v-if="form.errors.description" class="invalid-feedback">{{ form.errors.description }}</div>
+              <!-- Chi tiết thanh toán -->
+              <div class="row">
+                <div class="col-12">
+                  <h5>Chi tiết thanh toán</h5>
+                  <div class="table-responsive">
+                    <table class="table table-bordered">
+                      <thead>
+                        <tr>
+                          <th style="width: 50px">STT</th>
+                          <th>Nội dung <span class="text-danger">*</span></th>
+                          <th style="width: 150px">Số tiền chưa thuế <span class="text-danger">*</span></th>
+                          <th style="width: 120px">Thuế GTGT</th>
+                          <th style="width: 150px">Tổng tiền</th>
+                          <th style="width: 120px">Số hóa đơn</th>
+                          <th style="width: 80px">Thao tác</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="(detail, index) in form.details" :key="index">
+                          <td class="text-center">{{ index + 1 }}</td>
+                          <td>
+                            <textarea
+                              v-model="detail.description"
+                              class="form-control"
+                              :class="{ 'is-invalid': form.errors[`details.${index}.description`] }"
+                              rows="2"
+                              placeholder="Nhập nội dung"
+                            ></textarea>
+                            <div v-if="form.errors[`details.${index}.description`]" class="invalid-feedback">
+                              {{ form.errors[`details.${index}.description`] }}
+                            </div>
+                          </td>
+                          <td>
+                            <input
+                              v-model="detail.amount_before_tax"
+                              @input="calculateTotal(detail)"
+                              type="number"
+                              class="form-control"
+                              :class="{ 'is-invalid': form.errors[`details.${index}.amount_before_tax`] }"
+                              placeholder="0"
+                            />
+                            <div v-if="form.errors[`details.${index}.amount_before_tax`]" class="invalid-feedback">
+                              {{ form.errors[`details.${index}.amount_before_tax`] }}
+                            </div>
+                          </td>
+                          <td>
+                            <input
+                              v-model="detail.tax_amount"
+                              @input="calculateTotal(detail)"
+                              type="number"
+                              class="form-control"
+                              placeholder="0"
+                            />
+                          </td>
+                          <td>
+                            <input :value="detail.total_amount" type="number" class="form-control" readonly />
+                          </td>
+                          <td>
+                            <input
+                              v-model="detail.invoice_number"
+                              type="text"
+                              class="form-control"
+                              placeholder="Số hóa đơn"
+                            />
+                          </td>
+                          <td class="text-center">
+                            <button
+                              v-if="form.details.length > 1"
+                              @click="removeDetail(index)"
+                              type="button"
+                              class="btn btn-sm btn-danger"
+                            >
+                              <i class="fas fa-trash"></i>
+                            </button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <button @click="addDetail" type="button" class="btn btn-sm btn-success mb-3">
+                    <i class="fas fa-plus"></i> Thêm dòng
+                  </button>
+                </div>
               </div>
 
-              <div class="form-group">
-                <label>Lý do <span class="text-danger">*</span></label>
-                <textarea
-                  v-model="form.reason"
-                  class="form-control"
-                  :class="{ 'is-invalid': form.errors.reason }"
-                  rows="2"
-                ></textarea>
-                <div v-if="form.errors.reason" class="invalid-feedback">{{ form.errors.reason }}</div>
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <label>Lý do <span class="text-danger">*</span></label>
+                    <textarea
+                      v-model="form.reason"
+                      class="form-control"
+                      :class="{ 'is-invalid': form.errors.reason }"
+                      rows="3"
+                      placeholder="Lý do thanh toán"
+                    ></textarea>
+                    <div v-if="form.errors.reason" class="invalid-feedback">{{ form.errors.reason }}</div>
+                  </div>
+                </div>
               </div>
 
               <div class="row">

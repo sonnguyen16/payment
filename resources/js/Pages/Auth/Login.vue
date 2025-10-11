@@ -24,9 +24,7 @@ const submit = () => {
 
   <div class="login-page">
     <div class="login-box">
-      <div class="login-logo">
-        <b>Payment</b> System
-      </div>
+      <div class="login-logo">QUẢN LÝ THU CHI</div>
 
       <div class="card">
         <div class="card-body login-card-body">

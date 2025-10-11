@@ -21,22 +21,7 @@ const submit = () => {
   <Head title="Tạo dự án mới" />
 
   <AdminLayout>
-    <div class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1 class="m-0">Tạo dự án mới</h1>
-          </div>
-          <div class="col-sm-6">
-            <Link :href="route('projects.index')" class="btn btn-secondary float-right">
-              <i class="fas fa-arrow-left"></i> Quay lại
-            </Link>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="content">
+    <div class="content pt-3">
       <div class="container-fluid">
         <div class="row">
           <div class="col-md-8">

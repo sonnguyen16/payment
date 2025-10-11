@@ -1,124 +1,262 @@
 <script setup>
-import AdminLayout from '@/Layouts/AdminLayout.vue';
-import { Head, useForm } from '@inertiajs/vue3';
+import AdminLayout from '@/Layouts/AdminLayout.vue'
+import { Head, useForm } from '@inertiajs/vue3'
 
 const props = defineProps({
-    projects: Array,
-    categories: Array,
-});
+  projects: Array,
+  categories: Array
+})
 
 const form = useForm({
-    category_id: '',
-    amount: '',
+  category_id: '',
+  reason: '',
+  expected_date: '',
+  priority: 'normal',
+  project_id: '',
+  details: [
+    {
+      description: '',
+      amount_before_tax: '',
+      tax_amount: 0,
+      total_amount: '',
+      invoice_number: ''
+    }
+  ]
+})
+
+const addDetail = () => {
+  form.details.push({
     description: '',
-    reason: '',
-    expected_date: '',
-    priority: 'normal',
-    project_id: '',
-});
+    amount_before_tax: '',
+    tax_amount: 0,
+    total_amount: '',
+    invoice_number: ''
+  })
+}
+
+const removeDetail = (index) => {
+  if (form.details.length > 1) {
+    form.details.splice(index, 1)
+  }
+}
+
+const calculateTotal = (detail) => {
+  const beforeTax = parseFloat(detail.amount_before_tax) || 0
+  const tax = parseFloat(detail.tax_amount) || 0
+  detail.total_amount = beforeTax + tax
+}
+
+const getTotalAmount = () => {
+  return form.details.reduce((sum, detail) => {
+    return sum + (parseFloat(detail.total_amount) || 0)
+  }, 0)
+}
 
 const submit = () => {
-    form.post(route('payment-requests.store'));
-};
+  form.post(route('payment-requests.store'))
+}
 </script>
 
 <template>
-    <Head title="Tạo phiếu đề xuất" />
+  <Head title="Tạo phiếu đề xuất" />
 
-    <AdminLayout>
-        <div class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1 class="m-0">Tạo phiếu đề xuất</h1>
-                    </div>
+  <AdminLayout>
+    <div class="content pt-3">
+      <div class="container-fluid">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Tạo phiếu đề xuất</h3>
+          </div>
+          <form @submit.prevent="submit">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group mb-1">
+                    <label>Danh mục <span class="text-danger">*</span></label>
+                    <select
+                      v-model="form.category_id"
+                      class="form-control"
+                      :class="{ 'is-invalid': form.errors.category_id }"
+                    >
+                      <option value="">-- Chọn danh mục --</option>
+                      <option v-for="category in categories" :key="category.id" :value="category.id">
+                        {{ category.name }}
+                      </option>
+                    </select>
+                    <div v-if="form.errors.category_id" class="invalid-feedback">{{ form.errors.category_id }}</div>
+                  </div>
                 </div>
-            </div>
-        </div>
+                <div class="col-md-6">
+                  <div class="form-group mb-1">
+                    <label>Tổng số tiền (VNĐ)</label>
+                    <input
+                      :value="getTotalAmount().toLocaleString('vi-VN')"
+                      type="text"
+                      class="form-control"
+                      readonly
+                    />
+                    <small class="text-muted">Tự động tính từ chi tiết bên dưới</small>
+                  </div>
+                </div>
+              </div>
 
-        <div class="content">
-            <div class="container-fluid">
-                <div class="card">
-                    <form @submit.prevent="submit">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Danh mục <span class="text-danger">*</span></label>
-                                        <select v-model="form.category_id" class="form-control" :class="{ 'is-invalid': form.errors.category_id }">
-                                            <option value="">-- Chọn danh mục --</option>
-                                            <option v-for="category in categories" :key="category.id" :value="category.id">
-                                                {{ category.name }}
-                                            </option>
-                                        </select>
-                                        <div v-if="form.errors.category_id" class="invalid-feedback">{{ form.errors.category_id }}</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Số tiền (VNĐ) <span class="text-danger">*</span></label>
-                                        <input v-model="form.amount" type="number" class="form-control" :class="{ 'is-invalid': form.errors.amount }" placeholder="Nhập số tiền">
-                                        <div v-if="form.errors.amount" class="invalid-feedback">{{ form.errors.amount }}</div>
-                                    </div>
-                                </div>
+              <!-- Chi tiết thanh toán -->
+              <div class="row">
+                <div class="col-12">
+                  <h5 class="mb-2">Chi tiết thanh toán</h5>
+                  <div class="table-responsive">
+                    <table class="table table-bordered">
+                      <thead>
+                        <tr>
+                          <th style="width: 50px">STT</th>
+                          <th>Nội dung <span class="text-danger">*</span></th>
+                          <th style="width: 150px">Số tiền chưa thuế <span class="text-danger">*</span></th>
+                          <th style="width: 120px">Thuế GTGT</th>
+                          <th style="width: 150px">Tổng tiền</th>
+                          <th style="width: 120px">Số hóa đơn</th>
+                          <th style="width: 80px">Thao tác</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="(detail, index) in form.details" :key="index">
+                          <td class="text-center">{{ index + 1 }}</td>
+                          <td>
+                            <textarea
+                              v-model="detail.description"
+                              class="form-control"
+                              :class="{ 'is-invalid': form.errors[`details.${index}.description`] }"
+                              rows="2"
+                              placeholder="Nhập nội dung"
+                            ></textarea>
+                            <div v-if="form.errors[`details.${index}.description`]" class="invalid-feedback">
+                              {{ form.errors[`details.${index}.description`] }}
                             </div>
-
-                            <div class="form-group">
-                                <label>Mô tả <span class="text-danger">*</span></label>
-                                <textarea v-model="form.description" class="form-control" :class="{ 'is-invalid': form.errors.description }" rows="3" placeholder="Mô tả chi tiết"></textarea>
-                                <div v-if="form.errors.description" class="invalid-feedback">{{ form.errors.description }}</div>
+                          </td>
+                          <td>
+                            <input
+                              v-model="detail.amount_before_tax"
+                              @input="calculateTotal(detail)"
+                              type="number"
+                              class="form-control"
+                              :class="{ 'is-invalid': form.errors[`details.${index}.amount_before_tax`] }"
+                              placeholder="0"
+                            />
+                            <div v-if="form.errors[`details.${index}.amount_before_tax`]" class="invalid-feedback">
+                              {{ form.errors[`details.${index}.amount_before_tax`] }}
                             </div>
-
-                            <div class="form-group">
-                                <label>Lý do <span class="text-danger">*</span></label>
-                                <textarea v-model="form.reason" class="form-control" :class="{ 'is-invalid': form.errors.reason }" rows="2" placeholder="Lý do chi"></textarea>
-                                <div v-if="form.errors.reason" class="invalid-feedback">{{ form.errors.reason }}</div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label>Ngày dự kiến <span class="text-danger">*</span></label>
-                                        <input v-model="form.expected_date" type="date" class="form-control" :class="{ 'is-invalid': form.errors.expected_date }">
-                                        <div v-if="form.errors.expected_date" class="invalid-feedback">{{ form.errors.expected_date }}</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label>Ưu tiên <span class="text-danger">*</span></label>
-                                        <select v-model="form.priority" class="form-control" :class="{ 'is-invalid': form.errors.priority }">
-                                            <option value="normal">Bình thường</option>
-                                            <option value="urgent">Gấp</option>
-                                        </select>
-                                        <div v-if="form.errors.priority" class="invalid-feedback">{{ form.errors.priority }}</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label>Dự án (nếu có)</label>
-                                        <select v-model="form.project_id" class="form-control" :class="{ 'is-invalid': form.errors.project_id }">
-                                            <option value="">-- Chọn dự án --</option>
-                                            <option v-for="project in projects" :key="project.id" :value="project.id">
-                                                {{ project.name }} ({{ project.code }})
-                                            </option>
-                                        </select>
-                                        <div v-if="form.errors.project_id" class="invalid-feedback">{{ form.errors.project_id }}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card-footer">
-                            <button type="submit" class="btn btn-primary" :disabled="form.processing">
-                                <i class="fas fa-save"></i> Lưu phiếu
+                          </td>
+                          <td>
+                            <input
+                              v-model="detail.tax_amount"
+                              @input="calculateTotal(detail)"
+                              type="number"
+                              class="form-control"
+                              placeholder="0"
+                            />
+                          </td>
+                          <td>
+                            <input :value="detail.total_amount" type="number" class="form-control" readonly />
+                          </td>
+                          <td>
+                            <input
+                              v-model="detail.invoice_number"
+                              type="text"
+                              class="form-control"
+                              placeholder="Số hóa đơn"
+                            />
+                          </td>
+                          <td class="text-center">
+                            <button
+                              v-if="form.details.length > 1"
+                              @click="removeDetail(index)"
+                              type="button"
+                              class="btn btn-sm btn-danger"
+                            >
+                              <i class="fas fa-trash"></i>
                             </button>
-                            <a :href="route('payment-requests.index')" class="btn btn-secondary ml-2">
-                                <i class="fas fa-times"></i> Hủy
-                            </a>
-                        </div>
-                    </form>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <button @click="addDetail" type="button" class="btn btn-sm btn-success mb-3">
+                    <i class="fas fa-plus"></i> Thêm dòng
+                  </button>
                 </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <label>Lý do <span class="text-danger">*</span></label>
+                    <textarea
+                      v-model="form.reason"
+                      class="form-control"
+                      :class="{ 'is-invalid': form.errors.reason }"
+                      rows="3"
+                      placeholder="Lý do thanh toán"
+                    ></textarea>
+                    <div v-if="form.errors.reason" class="invalid-feedback">{{ form.errors.reason }}</div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>Ngày dự kiến <span class="text-danger">*</span></label>
+                    <input
+                      v-model="form.expected_date"
+                      type="date"
+                      class="form-control"
+                      :class="{ 'is-invalid': form.errors.expected_date }"
+                    />
+                    <div v-if="form.errors.expected_date" class="invalid-feedback">{{ form.errors.expected_date }}</div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>Ưu tiên <span class="text-danger">*</span></label>
+                    <select
+                      v-model="form.priority"
+                      class="form-control"
+                      :class="{ 'is-invalid': form.errors.priority }"
+                    >
+                      <option value="normal">Bình thường</option>
+                      <option value="urgent">Gấp</option>
+                    </select>
+                    <div v-if="form.errors.priority" class="invalid-feedback">{{ form.errors.priority }}</div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>Dự án (nếu có)</label>
+                    <select
+                      v-model="form.project_id"
+                      class="form-control"
+                      :class="{ 'is-invalid': form.errors.project_id }"
+                    >
+                      <option value="">-- Chọn dự án --</option>
+                      <option v-for="project in projects" :key="project.id" :value="project.id">
+                        {{ project.name }} ({{ project.code }})
+                      </option>
+                    </select>
+                    <div v-if="form.errors.project_id" class="invalid-feedback">{{ form.errors.project_id }}</div>
+                  </div>
+                </div>
+              </div>
             </div>
+
+            <div class="card-footer">
+              <button type="submit" class="btn btn-primary" :disabled="form.processing">
+                <i class="fas fa-save"></i> Lưu phiếu
+              </button>
+              <a :href="route('payment-requests.index')" class="btn btn-secondary ml-2">
+                <i class="fas fa-times"></i> Hủy
+              </a>
+            </div>
+          </form>
         </div>
-    </AdminLayout>
+      </div>
+    </div>
+  </AdminLayout>
 </template>

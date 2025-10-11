@@ -49,10 +49,7 @@ const deleteProject = async () => {
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0">{{ project.name }}</h1>
-          </div>
-          <div class="col-sm-6">
-            <div class="float-right">
+            <div class="">
               <Link v-if="can.update" :href="route('projects.edit', project.id)" class="btn btn-warning mr-2">
                 <i class="fas fa-edit"></i> Chỉnh sửa
               </Link>
@@ -171,7 +168,7 @@ const deleteProject = async () => {
                 <h3 class="card-title">Phiếu đề xuất liên quan</h3>
               </div>
               <div class="card-body p-0">
-                <table class="table table-striped">
+                <table class="table">
                   <thead>
                     <tr>
                       <th>ID</th>

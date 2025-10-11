@@ -8,9 +8,9 @@ defineProps({
 })
 
 const formatMoney = (amount) => {
-  return new Intl.NumberFormat('vi-VN', { 
-    style: 'currency', 
-    currency: 'VND' 
+  return new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND'
   }).format(amount)
 }
 
@@ -27,10 +27,7 @@ const formatDate = (date) => {
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>Chi tiết danh mục</h1>
-          </div>
-          <div class="col-sm-6">
-            <div class="float-sm-right">
+            <div class="">
               <Link :href="route('categories.edit', category.id)" class="btn btn-warning mr-2">
                 <i class="fas fa-edit"></i> Chỉnh sửa
               </Link>
@@ -53,10 +50,7 @@ const formatDate = (date) => {
               </div>
               <div class="card-body">
                 <div class="d-flex align-items-center mb-4">
-                  <div 
-                    class="color-indicator mr-3" 
-                    :style="{ backgroundColor: category.color }"
-                  ></div>
+                  <div class="color-indicator mr-3" :style="{ backgroundColor: category.color }"></div>
                   <div>
                     <h4 class="mb-1">{{ category.name }}</h4>
                     <p class="mb-0 text-muted">{{ category.description || 'Không có mô tả' }}</p>
@@ -72,15 +66,17 @@ const formatDate = (date) => {
                   </span>
                 </div>
 
-                <hr>
+                <hr />
 
                 <div class="row">
                   <div class="col-6">
-                    <strong>Số phiếu:</strong><br>
-                    <span class="text-primary">{{ category.payment_requests ? category.payment_requests.length : 0 }}</span>
+                    <strong>Số phiếu:</strong><br />
+                    <span class="text-primary">{{
+                      category.payment_requests ? category.payment_requests.length : 0
+                    }}</span>
                   </div>
                   <div class="col-6">
-                    <strong>Ngày tạo:</strong><br>
+                    <strong>Ngày tạo:</strong><br />
                     {{ formatDate(category.created_at) }}
                   </div>
                 </div>
@@ -126,10 +122,7 @@ const formatDate = (date) => {
                 </div>
               </div>
               <div class="card-footer" v-if="category.payment_requests && category.payment_requests.length >= 10">
-                <Link 
-                  :href="route('payment-requests.index', { category: category.id })" 
-                  class="btn btn-sm btn-primary"
-                >
+                <Link :href="route('payment-requests.index', { category: category.id })" class="btn btn-sm btn-primary">
                   Xem tất cả phiếu của danh mục này
                 </Link>
               </div>
@@ -147,6 +140,6 @@ const formatDate = (date) => {
   height: 50px;
   border-radius: 50%;
   border: 3px solid #fff;
-  box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
 }
 </style>

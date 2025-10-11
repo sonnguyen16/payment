@@ -1,11 +1,18 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue'
 import Pagination from '@/Components/Pagination.vue'
-import { Head, Link } from '@inertiajs/vue3'
+import { Head, Link, router } from '@inertiajs/vue3'
+import { ref } from 'vue'
 
-defineProps({
-  users: Object
+const props = defineProps({
+  users: Object,
+  offices: Array,
+  filters: Object
 })
+
+const search = ref(props.filters?.search || '')
+const role = ref(props.filters?.role || '')
+const office_id = ref(props.filters?.office_id || '')
 
 const getRoleBadgeClass = (roleName) => {
   const badges = {
@@ -28,35 +35,87 @@ const getRoleLabel = (roleName) => {
   }
   return labels[roleName] || roleName
 }
+
+const applyFilters = () => {
+  router.get(
+    route('admin.users.index'),
+    {
+      search: search.value,
+      role: role.value,
+      office_id: office_id.value
+    },
+    {
+      preserveState: true,
+      preserveScroll: true
+    }
+  )
+}
+
+const clearFilters = () => {
+  search.value = ''
+  role.value = ''
+  office_id.value = ''
+  router.get(route('admin.users.index'))
+}
 </script>
 
 <template>
   <Head title="Quản lý người dùng" />
 
   <AdminLayout>
-    <div class="content-header">
+    <div class="content pt-3">
       <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1 class="m-0">Quản lý người dùng</h1>
-          </div>
-          <div class="col-sm-6">
-            <Link :href="route('admin.users.create')" class="btn btn-primary float-right">
-              <i class="fas fa-plus"></i> Thêm người dùng
-            </Link>
+        <!-- Filter Toolbar -->
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-3">
+                <input
+                  v-model="search"
+                  @keyup.enter="applyFilters"
+                  type="text"
+                  class="form-control"
+                  placeholder="Tìm kiếm tên, email..."
+                />
+              </div>
+              <div class="col-md-2">
+                <select v-model="role" @change="applyFilters" class="form-control">
+                  <option value="">Tất cả vai trò</option>
+                  <option value="admin">Admin</option>
+                  <option value="ceo">Tổng Giám Đốc</option>
+                  <option value="accountant">Kế Toán</option>
+                  <option value="department_head">Trưởng Bộ Phận</option>
+                  <option value="employee">Nhân Viên</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <select v-model="office_id" @change="applyFilters" class="form-control">
+                  <option value="">Tất cả văn phòng</option>
+                  <option v-for="office in offices" :key="office.id" :value="office.id">
+                    {{ office.name }}
+                  </option>
+                </select>
+              </div>
+              <div class="col-md-3 d-flex gap-3">
+                <button @click="clearFilters" class="btn btn-secondary"><i class="fas fa-times"></i> Xóa bộ lọc</button>
+                <Link :href="route('admin.users.create')" class="btn btn-primary">
+                  <i class="fas fa-plus"></i> Thêm người dùng
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
 
-    <div class="content">
-      <div class="container-fluid">
+        <!-- Table -->
         <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Danh sách người dùng</h3>
+          </div>
           <div class="card-body p-0">
-            <table class="table table-striped">
+            <table class="table">
               <thead>
                 <tr>
-                  <th>ID</th>
+                  <th style="width: 50px">STT</th>
                   <th>Tên</th>
                   <th>Email</th>
                   <th>Vai trò</th>
@@ -66,12 +125,17 @@ const getRoleLabel = (roleName) => {
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="user in users.data" :key="user.id">
-                  <td>{{ user.id }}</td>
+                <tr v-for="(user, index) in users.data" :key="user.id">
+                  <td>{{ users.from + index }}</td>
                   <td>{{ user.name }}</td>
                   <td>{{ user.email }}</td>
                   <td>
-                    <span v-for="role in user.roles" :key="role.id" class="badge mr-1" :class="getRoleBadgeClass(role.name)">
+                    <span
+                      v-for="role in user.roles"
+                      :key="role.id"
+                      class="badge mr-1"
+                      :class="getRoleBadgeClass(role.name)"
+                    >
                       {{ getRoleLabel(role.name) }}
                     </span>
                   </td>

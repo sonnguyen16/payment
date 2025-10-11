@@ -13,18 +13,37 @@ class ProjectController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $this->authorize('viewAny', Project::class);
 
-        $projects = Project::withCount('paymentRequests')
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
+        $query = Project::withCount('paymentRequests');
+
+        // Filter by search
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('code', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $projects = $query->orderBy('created_at', 'desc')->paginate(20);
 
         return Inertia::render('Projects/Index', [
-            'projects' => ProjectResource::collection($projects),
+            'projects' => $projects,
             'can' => [
                 'create' => auth()->user()->can('create', Project::class),
+            ],
+            'filters' => [
+                'search' => $request->search,
+                'status' => $request->status,
             ],
         ]);
     }

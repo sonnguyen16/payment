@@ -17,15 +17,30 @@ class DepartmentController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $departments = Department::with(['office', 'head'])
-            ->withCount('users')
-            ->orderBy('name')
-            ->paginate(20);
+        $query = Department::with(['office', 'head'])->withCount('users');
+
+        // Filter by search
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where('name', 'like', "%{$search}%");
+        }
+
+        // Filter by office
+        if ($request->filled('office_id')) {
+            $query->where('office_id', $request->office_id);
+        }
+
+        $departments = $query->orderBy('name')->paginate(20);
 
         return Inertia::render('Admin/Departments/Index', [
             'departments' => $departments,
+            'offices' => \App\Models\Office::all(),
+            'filters' => [
+                'search' => $request->search,
+                'office_id' => $request->office_id,
+            ],
         ]);
     }
 
@@ -97,6 +112,11 @@ class DepartmentController extends Controller
      */
     public function destroy(Department $department)
     {
+        // Kiểm tra xem có nhân viên nào đang thuộc bộ phận này không
+        if ($department->users()->count() > 0) {
+            return back()->with('error', 'Không thể xóa bộ phận này vì đang có nhân viên!');
+        }
+
         $department->delete();
 
         return redirect()->route('admin.departments.index')->with('success', 'Bộ phận đã được xóa');

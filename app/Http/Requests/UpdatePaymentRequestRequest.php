@@ -23,12 +23,16 @@ class UpdatePaymentRequestRequest extends FormRequest
     {
         return [
             'category_id' => 'required|exists:categories,id',
-            'amount' => 'required|numeric|min:0|max:999999999999',
-            'description' => 'required|string|max:1000',
             'reason' => 'required|string|max:500',
             'expected_date' => 'required|date|after_or_equal:today',
             'priority' => 'required|in:urgent,normal',
             'project_id' => 'nullable|exists:projects,id',
+            'details' => 'required|array|min:1',
+            'details.*.description' => 'required|string|max:1000',
+            'details.*.amount_before_tax' => 'required|numeric|min:0|max:999999999999',
+            'details.*.tax_amount' => 'nullable|numeric|min:0|max:999999999999',
+            'details.*.total_amount' => 'required|numeric|min:0|max:999999999999',
+            'details.*.invoice_number' => 'nullable|string|max:255',
             'update_reason' => 'required|string|max:500',
         ];
     }
