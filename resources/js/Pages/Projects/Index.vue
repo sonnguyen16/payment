@@ -121,7 +121,7 @@ const clearFilters = () => {
               </thead>
               <tbody>
                 <tr v-for="(project, index) in projects.data" :key="project.id">
-                  <td>{{ projects.from + index }}</td>
+                  <td class="text-center">{{ projects.from + index }}</td>
                   <td>
                     <Link :href="route('projects.show', project.id)" class="text-primary">
                       {{ project.name }}
@@ -142,9 +142,14 @@ const clearFilters = () => {
                   </td>
                   <td class="text-center">{{ project.payment_requests_count || 0 }}</td>
                   <td>
-                    <Link :href="route('projects.show', project.id)" class="btn btn-sm btn-primary">
-                      <i class="fas fa-eye"></i>
-                    </Link>
+                    <div class="btn-group">
+                      <Link :href="route('projects.show', project.id)" class="btn btn-sm btn-primary">
+                        <i class="fas fa-eye"></i>
+                      </Link>
+                      <Link v-if="can.update" :href="route('projects.edit', project.id)" class="btn btn-sm btn-info">
+                        <i class="fas fa-edit"></i>
+                      </Link>
+                    </div>
                   </td>
                 </tr>
                 <tr v-if="projects.data.length === 0">

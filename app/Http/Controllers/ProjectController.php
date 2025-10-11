@@ -40,6 +40,7 @@ class ProjectController extends Controller
             'projects' => $projects,
             'can' => [
                 'create' => auth()->user()->can('create', Project::class),
+                'update' => auth()->user()->can('update', Project::class),
             ],
             'filters' => [
                 'search' => $request->search,

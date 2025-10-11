@@ -131,7 +131,7 @@ const clearFilters = () => {
                   <td>{{ formatDate(request.created_at) }}</td>
                   <td>
                     <Link :href="route('payment-requests.show', request.id)" class="btn btn-sm btn-info">
-                      <i class="fas fa-eye"></i> Xem
+                      <i class="fas fa-eye"></i>
                     </Link>
                   </td>
                 </tr>

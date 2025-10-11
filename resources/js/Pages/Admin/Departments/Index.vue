@@ -108,7 +108,7 @@ const deleteDepartment = (department) => {
               </thead>
               <tbody>
                 <tr v-for="(dept, index) in departments.data" :key="dept.id">
-                  <td>{{ departments.from + index }}</td>
+                  <td class="text-center">{{ departments.from + index }}</td>
                   <td>{{ dept.name }}</td>
                   <td>{{ dept.office?.name || '-' }}</td>
                   <td>{{ dept.head?.name || '-' }}</td>

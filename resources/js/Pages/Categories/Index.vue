@@ -107,7 +107,7 @@ const deleteCategory = (category) => {
               </thead>
               <tbody>
                 <tr v-for="(category, index) in categories.data" :key="category.id">
-                  <td>{{ categories.from + index }}</td>
+                  <td class="text-center">{{ categories.from + index }}</td>
                   <td>
                     <div class="d-flex align-items-center">
                       <div class="color-indicator mr-2" :style="{ backgroundColor: category.color }"></div>

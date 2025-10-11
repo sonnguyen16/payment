@@ -130,7 +130,7 @@ const getStatusBadgeClass = (status) => {
                   </thead>
                   <tbody>
                     <tr v-for="(request, index) in recent_requests" :key="request.id">
-                      <td>{{ index + 1 }}</td>
+                      <td class="text-center">{{ index + 1 }}</td>
                       <td>{{ formatMoney(request.amount) }}</td>
                       <td>
                         <span class="badge" :class="getStatusBadgeClass(request.status)">
@@ -175,7 +175,7 @@ const getStatusBadgeClass = (status) => {
                   </thead>
                   <tbody>
                     <tr v-for="(request, index) in pending_my_approval" :key="request.id">
-                      <td>{{ index + 1 }}</td>
+                      <td class="text-center">{{ index + 1 }}</td>
                       <td>{{ request.user.name }}</td>
                       <td>{{ formatMoney(request.amount) }}</td>
                       <td>

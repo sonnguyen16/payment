@@ -78,7 +78,7 @@ const clearFilters = () => {
               </thead>
               <tbody>
                 <tr v-for="(office, index) in offices.data" :key="office.id">
-                  <td>{{ offices.from + index }}</td>
+                  <td class="text-center">{{ offices.from + index }}</td>
                   <td>{{ office.name }}</td>
                   <td>{{ office.location || '-' }}</td>
                   <td class="text-center">{{ office.departments_count || 0 }}</td>

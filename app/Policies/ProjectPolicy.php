@@ -38,7 +38,7 @@ class ProjectPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Project $project): bool
+    public function update(User $user): bool
     {
         // Only department heads and above can update projects
         return $user->hasAnyRole(['department_head', 'ceo', 'admin']);

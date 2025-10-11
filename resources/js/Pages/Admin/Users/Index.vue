@@ -126,7 +126,7 @@ const clearFilters = () => {
               </thead>
               <tbody>
                 <tr v-for="(user, index) in users.data" :key="user.id">
-                  <td>{{ users.from + index }}</td>
+                  <td class="text-center">{{ users.from + index }}</td>
                   <td>{{ user.name }}</td>
                   <td>{{ user.email }}</td>
                   <td>
