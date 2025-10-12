@@ -498,7 +498,10 @@ const formattedUpdateHistories = computed(() => {
                       </td>
                       <td>
                         <a :href="route('documents.show', doc.id)" target="_blank" class="text-primary">
-                          <i class="fas fa-download"></i> {{ doc.original_name }}
+                          <i class="fas fa-download"></i>
+                          {{
+                            doc.original_name.length > 20 ? doc.original_name.slice(0, 20) + '...' : doc.original_name
+                          }}
                         </a>
                         <small class="text-muted d-block">{{ doc.size_formatted }}</small>
                       </td>
