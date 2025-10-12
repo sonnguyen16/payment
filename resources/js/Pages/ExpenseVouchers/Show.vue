@@ -49,24 +49,7 @@ const deleteVoucher = () => {
   <Head title="Chi tiết phiếu chi" />
 
   <AdminLayout>
-    <div class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1 class="m-0">Chi tiết phiếu chi</h1>
-          </div>
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><Link :href="route('dashboard')">Dashboard</Link></li>
-              <li class="breadcrumb-item"><Link :href="route('expense-vouchers.index')">Phiếu chi</Link></li>
-              <li class="breadcrumb-item active">Chi tiết</li>
-            </ol>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="content">
+    <div class="content pt-3">
       <div class="container-fluid">
         <!-- Actions -->
         <div class="mb-3">
@@ -98,10 +81,7 @@ const deleteVoucher = () => {
                     <th>Danh mục:</th>
                     <td>
                       <div class="d-flex align-items-center" v-if="voucher.category">
-                        <div
-                          class="category-indicator mr-2"
-                          :style="{ backgroundColor: voucher.category.color }"
-                        ></div>
+                        <div class="category-indicator mr-2" :style="{ backgroundColor: voucher.category.color }"></div>
                         {{ voucher.category.name }}
                       </div>
                       <span v-else class="text-muted">-</span>

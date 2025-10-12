@@ -41,26 +41,7 @@ const submit = () => {
   <Head title="Tạo phiếu chi" />
 
   <AdminLayout>
-    <div class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1 class="m-0">Tạo phiếu chi</h1>
-          </div>
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><router-link :to="{ name: 'dashboard' }">Dashboard</router-link></li>
-              <li class="breadcrumb-item">
-                <router-link :to="{ name: 'expense-vouchers.index' }">Phiếu chi</router-link>
-              </li>
-              <li class="breadcrumb-item active">Tạo mới</li>
-            </ol>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="content">
+    <div class="content pt-3">
       <div class="container-fluid">
         <div class="card">
           <div class="card-header">
@@ -106,7 +87,11 @@ const submit = () => {
                 <div class="col-md-6">
                   <div class="form-group">
                     <label>Dự án</label>
-                    <select v-model="form.project_id" class="form-control" :class="{ 'is-invalid': form.errors.project_id }">
+                    <select
+                      v-model="form.project_id"
+                      class="form-control"
+                      :class="{ 'is-invalid': form.errors.project_id }"
+                    >
                       <option value="">-- Chọn dự án (nếu có) --</option>
                       <option v-for="project in projects" :key="project.id" :value="project.id">
                         {{ project.name }}
