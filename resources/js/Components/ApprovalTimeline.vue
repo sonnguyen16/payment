@@ -4,7 +4,15 @@ defineProps({
 })
 
 const formatDateTime = (datetime) => {
-  return new Date(datetime).toLocaleString('vi-VN')
+  const d = new Date(datetime)
+  const day = String(d.getDate()).padStart(2, '0')
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const year = d.getFullYear()
+  const hours = d.getHours()
+  const minutes = String(d.getMinutes()).padStart(2, '0')
+  const ampm = hours >= 12 ? 'PM' : 'AM'
+  const displayHours = hours % 12 || 12
+  return `${day}/${month}/${year} ${displayHours}:${minutes} ${ampm}`
 }
 
 const formatChangeValue = (field, value) => {
@@ -49,9 +57,19 @@ const getFieldLabel = (field) => {
     reason: 'Lý do',
     expected_date: 'Ngày dự kiến',
     priority: 'Ưu tiên',
-    update_reason: 'Lý do sửa'
+    update_reason: 'Lý do sửa',
+    category_id: 'Danh mục',
+    project_id: 'Dự án',
+    details: 'Chi tiết thanh toán'
   }
   return labels[field] || field
+}
+
+const formatMoney = (amount) => {
+  return new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND'
+  }).format(amount)
 }
 
 const getActionIcon = (action) => {
@@ -65,7 +83,8 @@ const getActionIcon = (action) => {
     deleted: 'fa-trash',
     payment_processed: 'fa-money-bill-wave'
   }
-  return icons[action] || 'fa-circle'
+  // Default to 'updated' if no action specified (for update_histories)
+  return icons[action] || icons['updated']
 }
 
 const getActionColor = (action) => {
@@ -75,11 +94,12 @@ const getActionColor = (action) => {
     approved: 'text-success',
     rejected: 'text-danger',
     cancelled: 'text-warning',
-    updated: 'text-secondary',
+    updated: 'text-warning',
     deleted: 'text-dark',
     payment_processed: 'text-success'
   }
-  return colors[action] || 'text-muted'
+  // Default to 'updated' color if no action specified
+  return colors[action] || colors['updated']
 }
 
 const getActionLabel = (action) => {
@@ -93,7 +113,8 @@ const getActionLabel = (action) => {
     deleted: 'Xóa',
     payment_processed: 'Đã thanh toán'
   }
-  return labels[action] || action
+  // Default to 'Chỉnh sửa' if no action specified
+  return labels[action] || labels['updated']
 }
 </script>
 
@@ -113,16 +134,108 @@ const getActionLabel = (action) => {
         <div class="timeline-body" v-if="history.reason">
           <p class="mb-0"><strong>Lý do:</strong> {{ history.reason }}</p>
         </div>
-        <div class="timeline-body" v-if="history.changes && history.changes.length > 0">
+        <div class="timeline-body" v-if="history.changes && Object.keys(history.changes).length > 0">
           <p class="mb-1"><strong>Thay đổi:</strong></p>
-          <ul class="mb-0">
-            <li v-for="(change, index) in history.changes" :key="index">
-              <strong>{{ getFieldLabel(change.field) }}:</strong>
-              <span class="text-muted">{{ formatChangeValue(change.field, change.old_value) }}</span>
+          <div v-for="(change, field) in history.changes" :key="field">
+            <!-- Nếu là details (chi tiết thanh toán) -->
+            <div v-if="field === 'details' && change.details">
+              <strong class="text-primary">{{ getFieldLabel(field) }}:</strong>
+              <div class="ml-3 mt-2">
+                <!-- Các dòng đã thêm -->
+                <div v-if="change.details.added && change.details.added.length > 0" class="mb-2">
+                  <span class="badge badge-success">Đã thêm {{ change.details.added.length }} dòng</span>
+                  <table class="table table-sm table-bordered mt-1">
+                    <thead class="bg-success text-white">
+                      <tr>
+                        <th style="width: 40%">Nội dung</th>
+                        <th>Tiền chưa thuế</th>
+                        <th>Thuế</th>
+                        <th>Tổng</th>
+                        <th>Số HĐ</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(detail, idx) in change.details.added" :key="'add-' + idx">
+                        <td>{{ detail.description }}</td>
+                        <td class="text-right">{{ formatMoney(detail.amount_before_tax) }}</td>
+                        <td class="text-right">{{ formatMoney(detail.tax_amount) }}</td>
+                        <td class="text-right">{{ formatMoney(detail.total_amount) }}</td>
+                        <td>{{ detail.invoice_number || '-' }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <!-- Các dòng đã xóa -->
+                <div v-if="change.details.removed && change.details.removed.length > 0" class="mb-2">
+                  <span class="badge badge-danger">Đã xóa {{ change.details.removed.length }} dòng</span>
+                  <table class="table table-sm table-bordered mt-1">
+                    <thead class="bg-danger text-white">
+                      <tr>
+                        <th style="width: 40%">Nội dung</th>
+                        <th>Tiền chưa thuế</th>
+                        <th>Thuế</th>
+                        <th>Tổng</th>
+                        <th>Số HĐ</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(detail, idx) in change.details.removed" :key="'rem-' + idx">
+                        <td>{{ detail.description }}</td>
+                        <td class="text-right">{{ formatMoney(detail.amount_before_tax) }}</td>
+                        <td class="text-right">{{ formatMoney(detail.tax_amount) }}</td>
+                        <td class="text-right">{{ formatMoney(detail.total_amount) }}</td>
+                        <td>{{ detail.invoice_number || '-' }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <!-- Các dòng đã sửa -->
+                <div v-if="change.details.modified && change.details.modified.length > 0" class="mb-2">
+                  <span class="badge badge-warning">Đã sửa {{ change.details.modified.length }} dòng</span>
+                  <div v-for="(mod, idx) in change.details.modified" :key="'mod-' + idx" class="mt-2">
+                    <small class="text-muted">Dòng {{ idx + 1 }}:</small>
+                    <table class="table table-sm table-bordered mt-1">
+                      <thead class="bg-warning">
+                        <tr>
+                          <th style="width: 15%">Trạng thái</th>
+                          <th style="width: 30%">Nội dung</th>
+                          <th>Tiền chưa thuế</th>
+                          <th>Thuế</th>
+                          <th>Tổng</th>
+                          <th>Số HĐ</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr class="bg-light">
+                          <td><span class="badge badge-secondary">Cũ</span></td>
+                          <td>{{ mod.old.description }}</td>
+                          <td class="text-right">{{ formatMoney(mod.old.amount_before_tax) }}</td>
+                          <td class="text-right">{{ formatMoney(mod.old.tax_amount) }}</td>
+                          <td class="text-right">{{ formatMoney(mod.old.total_amount) }}</td>
+                          <td>{{ mod.old.invoice_number || '-' }}</td>
+                        </tr>
+                        <tr class="bg-success text-white">
+                          <td><span class="badge badge-success">Mới</span></td>
+                          <td>{{ mod.new.description }}</td>
+                          <td class="text-right">{{ formatMoney(mod.new.amount_before_tax) }}</td>
+                          <td class="text-right">{{ formatMoney(mod.new.tax_amount) }}</td>
+                          <td class="text-right">{{ formatMoney(mod.new.total_amount) }}</td>
+                          <td>{{ mod.new.invoice_number || '-' }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Các trường khác -->
+            <div v-else class="mb-1">
+              <strong>{{ getFieldLabel(field) }}:</strong>
+              <span class="text-danger">{{ change.old }}</span>
               →
-              <span class="text-success">{{ formatChangeValue(change.field, change.new_value) }}</span>
-            </li>
-          </ul>
+              <span class="text-success">{{ change.new }}</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>

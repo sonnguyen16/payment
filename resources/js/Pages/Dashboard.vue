@@ -93,7 +93,7 @@ const getStatusBadgeClass = (status) => {
             </div>
           </div>
           <div class="col-lg-3 col-6">
-            <div class="small-box bg-danger">
+            <div class="small-box bg-primary">
               <div class="inner">
                 <h3>{{ formatMoney(stats.total_amount_this_month) }}</h3>
                 <p>Tổng tiền tháng này</p>
@@ -131,14 +131,14 @@ const getStatusBadgeClass = (status) => {
                   <tbody>
                     <tr v-for="(request, index) in recent_requests" :key="request.id">
                       <td class="text-center">{{ index + 1 }}</td>
-                      <td>{{ formatMoney(request.amount) }}</td>
-                      <td>
+                      <td class="text-right">{{ formatMoney(request.amount) }}</td>
+                      <td class="text-center">
                         <span class="badge" :class="getStatusBadgeClass(request.status)">
                           {{ getStatusLabel(request.status) }}
                         </span>
                       </td>
-                      <td>{{ formatDate(request.created_at) }}</td>
-                      <td>
+                      <td class="text-center">{{ formatDate(request.created_at) }}</td>
+                      <td class="text-center">
                         <Link :href="route('payment-requests.show', request.id)" class="btn btn-sm btn-info">
                           <i class="fas fa-eye"></i> Xem
                         </Link>
@@ -177,13 +177,13 @@ const getStatusBadgeClass = (status) => {
                     <tr v-for="(request, index) in pending_my_approval" :key="request.id">
                       <td class="text-center">{{ index + 1 }}</td>
                       <td>{{ request.user.name }}</td>
-                      <td>{{ formatMoney(request.amount) }}</td>
-                      <td>
+                      <td class="text-right">{{ formatMoney(request.amount) }}</td>
+                      <td class="text-center">
                         <span class="badge" :class="request.priority === 'urgent' ? 'badge-danger' : 'badge-secondary'">
                           {{ request.priority === 'urgent' ? 'Gấp' : 'Bình thường' }}
                         </span>
                       </td>
-                      <td>
+                      <td class="text-center">
                         <Link :href="route('payment-requests.show', request.id)" class="btn btn-sm btn-warning">
                           <i class="fas fa-eye"></i> Duyệt
                         </Link>

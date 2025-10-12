@@ -10,7 +10,7 @@ const form = useForm({
 })
 
 const submit = () => {
-  form.post(route('categories.store'))
+  form.post(route('admin.categories.store'))
 }
 </script>
 
@@ -103,7 +103,7 @@ const submit = () => {
                     <i class="fas fa-save"></i>
                     {{ form.processing ? 'Đang lưu...' : 'Lưu danh mục' }}
                   </button>
-                  <Link :href="route('categories.index')" class="btn btn-secondary ml-2"> Hủy </Link>
+                  <Link :href="route('admin.categories.index')" class="btn btn-secondary ml-2"> Hủy </Link>
                 </div>
               </form>
             </div>

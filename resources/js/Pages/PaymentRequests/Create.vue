@@ -1,16 +1,23 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue'
-import { Head, useForm } from '@inertiajs/vue3'
+import { Head, router, useForm } from '@inertiajs/vue3'
 
 const props = defineProps({
   projects: Array,
   categories: Array
 })
 
+const getNextDay = () => {
+  const today = new Date()
+  const tomorrow = new Date(today)
+  tomorrow.setDate(today.getDate() + 1)
+  return tomorrow.toISOString().split('T')[0]
+}
+
 const form = useForm({
   category_id: '',
   reason: '',
-  expected_date: '',
+  expected_date: getNextDay(), // tomorrow date ,
   priority: 'normal',
   project_id: '',
   details: [
@@ -40,15 +47,32 @@ const removeDetail = (index) => {
   }
 }
 
+const formatNumber = (value) => {
+  if (!value) return ''
+  const num = value.toString().replace(/[^0-9]/g, '')
+  return num.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+}
+
+const parseNumber = (value) => {
+  if (!value) return 0
+  return parseFloat(value.toString().replace(/,/g, '')) || 0
+}
+
+const handleAmountInput = (detail, field, event) => {
+  const rawValue = event.target.value.replace(/,/g, '')
+  detail[field] = rawValue
+  calculateTotal(detail)
+}
+
 const calculateTotal = (detail) => {
-  const beforeTax = parseFloat(detail.amount_before_tax) || 0
-  const tax = parseFloat(detail.tax_amount) || 0
+  const beforeTax = parseNumber(detail.amount_before_tax)
+  const tax = parseNumber(detail.tax_amount)
   detail.total_amount = beforeTax + tax
 }
 
 const getTotalAmount = () => {
   return form.details.reduce((sum, detail) => {
-    return sum + (parseFloat(detail.total_amount) || 0)
+    return sum + parseNumber(detail.total_amount)
   }, 0)
 }
 
@@ -89,12 +113,7 @@ const submit = () => {
                 <div class="col-md-6">
                   <div class="form-group mb-1">
                     <label>Tổng số tiền (VNĐ)</label>
-                    <input
-                      :value="getTotalAmount().toLocaleString('vi-VN')"
-                      type="text"
-                      class="form-control"
-                      readonly
-                    />
+                    <input :value="formatNumber(getTotalAmount())" type="text" class="form-control" readonly />
                     <small class="text-muted">Tự động tính từ chi tiết bên dưới</small>
                   </div>
                 </div>
@@ -125,7 +144,7 @@ const submit = () => {
                               v-model="detail.description"
                               class="form-control"
                               :class="{ 'is-invalid': form.errors[`details.${index}.description`] }"
-                              rows="2"
+                              rows="1"
                               placeholder="Nhập nội dung"
                             ></textarea>
                             <div v-if="form.errors[`details.${index}.description`]" class="invalid-feedback">
@@ -134,9 +153,9 @@ const submit = () => {
                           </td>
                           <td>
                             <input
-                              v-model="detail.amount_before_tax"
-                              @input="calculateTotal(detail)"
-                              type="number"
+                              :value="formatNumber(detail.amount_before_tax)"
+                              @input="handleAmountInput(detail, 'amount_before_tax', $event)"
+                              type="text"
                               class="form-control"
                               :class="{ 'is-invalid': form.errors[`details.${index}.amount_before_tax`] }"
                               placeholder="0"
@@ -147,15 +166,20 @@ const submit = () => {
                           </td>
                           <td>
                             <input
-                              v-model="detail.tax_amount"
-                              @input="calculateTotal(detail)"
-                              type="number"
+                              :value="formatNumber(detail.tax_amount)"
+                              @input="handleAmountInput(detail, 'tax_amount', $event)"
+                              type="text"
                               class="form-control"
                               placeholder="0"
                             />
                           </td>
                           <td>
-                            <input :value="detail.total_amount" type="number" class="form-control" readonly />
+                            <input
+                              :value="formatNumber(detail.total_amount)"
+                              type="text"
+                              class="form-control"
+                              readonly
+                            />
                           </td>
                           <td>
                             <input
@@ -193,7 +217,7 @@ const submit = () => {
                       v-model="form.reason"
                       class="form-control"
                       :class="{ 'is-invalid': form.errors.reason }"
-                      rows="3"
+                      rows="2"
                       placeholder="Lý do thanh toán"
                     ></textarea>
                     <div v-if="form.errors.reason" class="invalid-feedback">{{ form.errors.reason }}</div>
@@ -201,7 +225,7 @@ const submit = () => {
                 </div>
               </div>
               <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-2">
                   <div class="form-group">
                     <label>Ngày dự kiến <span class="text-danger">*</span></label>
                     <input
@@ -213,7 +237,7 @@ const submit = () => {
                     <div v-if="form.errors.expected_date" class="invalid-feedback">{{ form.errors.expected_date }}</div>
                   </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-2">
                   <div class="form-group">
                     <label>Ưu tiên <span class="text-danger">*</span></label>
                     <select
@@ -250,7 +274,7 @@ const submit = () => {
               <button type="submit" class="btn btn-primary" :disabled="form.processing">
                 <i class="fas fa-save"></i> Lưu phiếu
               </button>
-              <a :href="route('payment-requests.index')" class="btn btn-secondary ml-2">
+              <a @click.prevent="router.visit(route('payment-requests.index'))" class="btn btn-secondary ml-2">
                 <i class="fas fa-times"></i> Hủy
               </a>
             </div>

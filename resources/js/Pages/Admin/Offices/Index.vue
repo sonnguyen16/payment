@@ -65,35 +65,39 @@ const clearFilters = () => {
             <h3 class="card-title">Danh sách văn phòng</h3>
           </div>
           <div class="card-body p-0">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th style="width: 50px">STT</th>
-                  <th>Tên văn phòng</th>
-                  <th>Địa chỉ</th>
-                  <th style="width: 100px">Số bộ phận</th>
-                  <th style="width: 100px">Số nhân viên</th>
-                  <th style="width: 100px">Thao tác</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(office, index) in offices.data" :key="office.id">
-                  <td class="text-center">{{ offices.from + index }}</td>
-                  <td>{{ office.name }}</td>
-                  <td>{{ office.location || '-' }}</td>
-                  <td class="text-center">{{ office.departments_count || 0 }}</td>
-                  <td class="text-center">{{ office.users_count || 0 }}</td>
-                  <td>
-                    <Link :href="route('admin.offices.edit', office.id)" class="btn btn-sm btn-warning">
-                      <i class="fas fa-edit"></i>
-                    </Link>
-                  </td>
-                </tr>
-                <tr v-if="offices.data.length === 0">
-                  <td colspan="6" class="text-center text-muted"><i class="fas fa-inbox"></i> Chưa có văn phòng nào</td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 50px">STT</th>
+                    <th>Tên văn phòng</th>
+                    <th>Địa chỉ</th>
+                    <th style="width: 100px">Số bộ phận</th>
+                    <th style="width: 100px">Số nhân viên</th>
+                    <th style="width: 100px">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(office, index) in offices.data" :key="office.id">
+                    <td class="text-center">{{ offices.from + index }}</td>
+                    <td>{{ office.name }}</td>
+                    <td>{{ office.location || '-' }}</td>
+                    <td class="text-center">{{ office.departments_count || 0 }}</td>
+                    <td class="text-center">{{ office.users_count || 0 }}</td>
+                    <td class="text-center">
+                      <Link :href="route('admin.offices.edit', office.id)" class="btn btn-sm btn-warning">
+                        <i class="fas fa-edit"></i>
+                      </Link>
+                    </td>
+                  </tr>
+                  <tr v-if="offices.data.length === 0">
+                    <td colspan="6" class="text-center text-muted">
+                      <i class="fas fa-inbox"></i> Chưa có văn phòng nào
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
           <Pagination :links="offices.links" :meta="offices.meta" />
         </div>

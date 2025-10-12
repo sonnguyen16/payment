@@ -36,7 +36,7 @@ const deleteProject = async () => {
   })
 
   if (result.isConfirmed) {
-    useForm({}).delete(route('projects.destroy', project.value.id))
+    useForm({}).delete(route('admin.projects.destroy', project.value.id))
   }
 }
 </script>
@@ -50,13 +50,13 @@ const deleteProject = async () => {
         <div class="row mb-2">
           <div class="col-sm-6">
             <div class="">
-              <Link v-if="can.update" :href="route('projects.edit', project.id)" class="btn btn-warning mr-2">
+              <Link v-if="can.update" :href="route('admin.projects.edit', project.id)" class="btn btn-warning mr-2">
                 <i class="fas fa-edit"></i> Chỉnh sửa
               </Link>
-              <button v-if="can.delete" @click="deleteProject" class="btn btn-danger mr-2">
+              <!-- <button v-if="can.delete" @click="deleteProject" class="btn btn-danger mr-2">
                 <i class="fas fa-trash"></i> Xóa
-              </button>
-              <Link :href="route('projects.index')" class="btn btn-secondary">
+              </button> -->
+              <Link :href="route('admin.projects.index')" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Quay lại
               </Link>
             </div>

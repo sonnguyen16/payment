@@ -60,12 +60,12 @@ body {
 }
 
 .nav-link.active {
-  background-color: #0000001a !important;
+  background-color: #e3f2fd !important;
   color: rgba(0, 0, 0, 0.6) !important;
 }
 
 .nav-link:hover {
-  background-color: #0000001a !important;
+  background-color: #e3f2fd !important;
   color: rgba(0, 0, 0, 0.6) !important;
 }
 
@@ -76,8 +76,13 @@ body {
   min-height: unset !important;
 }
 
+.sidebar {
+  scrollbar-color: white !important;
+}
+
 .main-header {
   margin-left: 0 !important;
+  background-color: #f8f9fa !important;
 }
 
 .table th,
@@ -86,6 +91,10 @@ body {
   padding: 5px !important;
   vertical-align: middle !important;
   text-wrap: nowrap !important;
+}
+
+.table {
+  margin-bottom: 0 !important;
 }
 
 thead th {

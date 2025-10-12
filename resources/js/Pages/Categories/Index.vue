@@ -15,7 +15,7 @@ const is_active = ref(props.filters?.is_active || '')
 
 const applyFilters = () => {
   router.get(
-    route('categories.index'),
+    route('admin.categories.index'),
     {
       search: search.value,
       is_active: is_active.value
@@ -30,7 +30,7 @@ const applyFilters = () => {
 const clearFilters = () => {
   search.value = ''
   is_active.value = ''
-  router.get(route('categories.index'))
+  router.get(route('admin.categories.index'))
 }
 
 const deleteCategory = (category) => {
@@ -45,7 +45,7 @@ const deleteCategory = (category) => {
     cancelButtonText: 'Hủy'
   }).then((result) => {
     if (result.isConfirmed) {
-      router.delete(route('categories.destroy', category.id))
+      router.delete(route('admin.categories.destroy', category.id))
     }
   })
 }
@@ -79,7 +79,7 @@ const deleteCategory = (category) => {
               </div>
               <div class="col-md-5 d-flex gap-3">
                 <button @click="clearFilters" class="btn btn-secondary"><i class="fas fa-times"></i> Xóa bộ lọc</button>
-                <Link :href="route('categories.create')" class="btn btn-primary">
+                <Link :href="route('admin.categories.create')" class="btn btn-primary">
                   <i class="fas fa-plus"></i> Thêm danh mục
                 </Link>
               </div>
@@ -93,62 +93,66 @@ const deleteCategory = (category) => {
             <h3 class="card-title">Danh sách danh mục</h3>
           </div>
           <div class="card-body p-0">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th style="width: 50px">STT</th>
-                  <th>Tên danh mục</th>
-                  <th>Mô tả</th>
-                  <th>Màu sắc</th>
-                  <th>Trạng thái</th>
-                  <th>Số phiếu</th>
-                  <th>Thao tác</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(category, index) in categories.data" :key="category.id">
-                  <td class="text-center">{{ categories.from + index }}</td>
-                  <td>
-                    <div class="d-flex align-items-center">
-                      <div class="color-indicator mr-2" :style="{ backgroundColor: category.color }"></div>
-                      {{ category.name }}
-                    </div>
-                  </td>
-                  <td>{{ category.description || '-' }}</td>
-                  <td>
-                    <span class="badge" :style="{ backgroundColor: category.color, color: '#fff' }">
-                      {{ category.color }}
-                    </span>
-                  </td>
-                  <td>
-                    <span class="badge" :class="category.is_active ? 'badge-success' : 'badge-secondary'">
-                      {{ category.is_active ? 'Hoạt động' : 'Không hoạt động' }}
-                    </span>
-                  </td>
-                  <td>{{ category.payment_requests_count || 0 }}</td>
-                  <td>
-                    <div class="btn-group">
-                      <Link :href="route('categories.show', category.id)" class="btn btn-sm btn-info">
-                        <i class="fas fa-eye"></i>
-                      </Link>
-                      <Link :href="route('categories.edit', category.id)" class="btn btn-sm btn-warning">
-                        <i class="fas fa-edit"></i>
-                      </Link>
-                      <button
-                        v-if="category.payment_requests_count === 0"
-                        @click="deleteCategory(category)"
-                        class="btn btn-sm btn-danger"
-                      >
-                        <i class="fas fa-trash"></i>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                <tr v-if="categories.data.length === 0">
-                  <td colspan="6" class="text-center text-muted"><i class="fas fa-inbox"></i> Chưa có danh mục nào</td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 50px">STT</th>
+                    <th>Tên danh mục</th>
+                    <th>Mô tả</th>
+                    <th>Màu sắc</th>
+                    <th>Trạng thái</th>
+                    <th>Số phiếu</th>
+                    <th>Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(category, index) in categories.data" :key="category.id">
+                    <td class="text-center">{{ categories.from + index }}</td>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="color-indicator mr-2" :style="{ backgroundColor: category.color }"></div>
+                        {{ category.name }}
+                      </div>
+                    </td>
+                    <td>{{ category.description || '-' }}</td>
+                    <td class="text-center">
+                      <span class="badge" :style="{ backgroundColor: category.color, color: '#fff' }">
+                        {{ category.color }}
+                      </span>
+                    </td>
+                    <td class="text-center">
+                      <span class="badge" :class="category.is_active ? 'badge-success' : 'badge-secondary'">
+                        {{ category.is_active ? 'Hoạt động' : 'Không hoạt động' }}
+                      </span>
+                    </td>
+                    <td>{{ category.payment_requests_count || 0 }}</td>
+                    <td class="text-center">
+                      <div class="btn-group">
+                        <Link :href="route('admin.categories.show', category.id)" class="btn btn-sm btn-info">
+                          <i class="fas fa-eye"></i>
+                        </Link>
+                        <Link :href="route('admin.categories.edit', category.id)" class="btn btn-sm btn-warning">
+                          <i class="fas fa-edit"></i>
+                        </Link>
+                        <button
+                          v-if="category.payment_requests_count === 0"
+                          @click="deleteCategory(category)"
+                          class="btn btn-sm btn-danger"
+                        >
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr v-if="categories.data.length === 0">
+                    <td colspan="6" class="text-center text-muted">
+                      <i class="fas fa-inbox"></i> Chưa có danh mục nào
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
           <Pagination :links="categories.links" :meta="categories.meta" />
         </div>

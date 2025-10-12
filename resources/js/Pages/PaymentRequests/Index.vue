@@ -101,45 +101,47 @@ const clearFilters = () => {
             <h3 class="card-title">Danh sách phiếu đề xuất</h3>
           </div>
           <div class="card-body p-0">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>STT</th>
-                  <th>Loại</th>
-                  <th>Số tiền</th>
-                  <th>Mô tả</th>
-                  <th>Trạng thái</th>
-                  <th>Ưu tiên</th>
-                  <th>Ngày tạo</th>
-                  <th>Thao tác</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(request, index) in requests.data" :key="request.id">
-                  <td>{{ requests.from + index }}</td>
-                  <td>
-                    <div class="d-flex align-items-center" v-if="request.category">
-                      <div class="category-indicator mr-2" :style="{ backgroundColor: request.category.color }"></div>
-                      {{ request.category.name }}
-                    </div>
-                    <span v-else class="text-muted">Chưa phân loại</span>
-                  </td>
-                  <td>{{ formatMoney(request.amount) }}</td>
-                  <td>{{ request.description.substring(0, 50) }}...</td>
-                  <td><StatusBadge :status="request.status" /></td>
-                  <td><PriorityBadge :priority="request.priority" /></td>
-                  <td>{{ formatDate(request.created_at) }}</td>
-                  <td>
-                    <Link :href="route('payment-requests.show', request.id)" class="btn btn-sm btn-info">
-                      <i class="fas fa-eye"></i>
-                    </Link>
-                  </td>
-                </tr>
-                <tr v-if="requests.data.length === 0">
-                  <td colspan="8" class="text-center">Không có dữ liệu</td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>STT</th>
+                    <th>Loại</th>
+                    <th>Số tiền</th>
+                    <th>Mô tả</th>
+                    <th>Trạng thái</th>
+                    <th>Ưu tiên</th>
+                    <th>Ngày tạo</th>
+                    <th>Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(request, index) in requests.data" :key="request.id">
+                    <td class="text-center">{{ requests.from + index }}</td>
+                    <td>
+                      <div class="d-flex align-items-center" v-if="request.category">
+                        <div class="category-indicator mr-2" :style="{ backgroundColor: request.category.color }"></div>
+                        {{ request.category.name }}
+                      </div>
+                      <span v-else class="text-muted">Chưa phân loại</span>
+                    </td>
+                    <td class="text-right">{{ formatMoney(request.amount) }}</td>
+                    <td>{{ request.description.substring(0, 50) }}...</td>
+                    <td class="text-center"><StatusBadge :status="request.status" /></td>
+                    <td class="text-center"><PriorityBadge :priority="request.priority" /></td>
+                    <td class="text-center">{{ formatDate(request.created_at) }}</td>
+                    <td class="text-center">
+                      <Link :href="route('payment-requests.show', request.id)" class="btn btn-sm btn-info">
+                        <i class="fas fa-eye"></i>
+                      </Link>
+                    </td>
+                  </tr>
+                  <tr v-if="requests.data.length === 0">
+                    <td colspan="8" class="text-center">Không có dữ liệu</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
           <Pagination :links="requests.links" :meta="requests.meta" />
         </div>

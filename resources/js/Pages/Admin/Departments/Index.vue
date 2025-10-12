@@ -95,41 +95,43 @@ const deleteDepartment = (department) => {
             <h3 class="card-title">Danh sách bộ phận</h3>
           </div>
           <div class="card-body p-0">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th style="width: 50px">STT</th>
-                  <th>Tên</th>
-                  <th>Văn phòng</th>
-                  <th>Trưởng bộ phận</th>
-                  <th>Số nhân viên</th>
-                  <th>Thao tác</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(dept, index) in departments.data" :key="dept.id">
-                  <td class="text-center">{{ departments.from + index }}</td>
-                  <td>{{ dept.name }}</td>
-                  <td>{{ dept.office?.name || '-' }}</td>
-                  <td>{{ dept.head?.name || '-' }}</td>
-                  <td>{{ dept.users_count || 0 }}</td>
-                  <td>
-                    <div class="btn-group">
-                      <Link :href="route('admin.departments.edit', dept.id)" class="btn btn-sm btn-warning">
-                        <i class="fas fa-edit"></i>
-                      </Link>
-                      <button
-                        v-if="dept.users_count === 0"
-                        @click="deleteDepartment(dept)"
-                        class="btn btn-sm btn-danger"
-                      >
-                        <i class="fas fa-trash"></i>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 50px">STT</th>
+                    <th>Tên</th>
+                    <th>Văn phòng</th>
+                    <th>Trưởng bộ phận</th>
+                    <th>Số nhân viên</th>
+                    <th>Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(dept, index) in departments.data" :key="dept.id">
+                    <td class="text-center">{{ departments.from + index }}</td>
+                    <td>{{ dept.name }}</td>
+                    <td>{{ dept.office?.name || '-' }}</td>
+                    <td>{{ dept.head?.name || '-' }}</td>
+                    <td>{{ dept.users_count || 0 }}</td>
+                    <td class="text-center">
+                      <div class="btn-group">
+                        <Link :href="route('admin.departments.edit', dept.id)" class="btn btn-sm btn-warning">
+                          <i class="fas fa-edit"></i>
+                        </Link>
+                        <button
+                          v-if="dept.users_count === 0"
+                          @click="deleteDepartment(dept)"
+                          class="btn btn-sm btn-danger"
+                        >
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
           <Pagination :links="departments.links" :meta="departments.meta" />
         </div>

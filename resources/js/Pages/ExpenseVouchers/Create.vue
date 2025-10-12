@@ -1,0 +1,185 @@
+<script setup>
+import AdminLayout from '@/Layouts/AdminLayout.vue'
+import { Head, router, useForm } from '@inertiajs/vue3'
+
+const props = defineProps({
+  categories: Array,
+  projects: Array
+})
+
+const getTodayDate = () => {
+  const today = new Date()
+  return today.toISOString().split('T')[0]
+}
+
+const form = useForm({
+  expense_date: getTodayDate(),
+  description: '',
+  amount: '',
+  category_id: '',
+  project_id: '',
+  recipient: ''
+})
+
+const formatNumber = (value) => {
+  if (!value) return ''
+  const num = value.toString().replace(/[^0-9]/g, '')
+  return num.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+}
+
+const handleAmountInput = (event) => {
+  const rawValue = event.target.value.replace(/,/g, '')
+  form.amount = rawValue
+}
+
+const submit = () => {
+  form.post(route('expense-vouchers.store'))
+}
+</script>
+
+<template>
+  <Head title="Tạo phiếu chi" />
+
+  <AdminLayout>
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0">Tạo phiếu chi</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><router-link :to="{ name: 'dashboard' }">Dashboard</router-link></li>
+              <li class="breadcrumb-item">
+                <router-link :to="{ name: 'expense-vouchers.index' }">Phiếu chi</router-link>
+              </li>
+              <li class="breadcrumb-item active">Tạo mới</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="container-fluid">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Thông tin phiếu chi</h3>
+          </div>
+          <form @submit.prevent="submit">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label>Ngày chi <span class="text-danger">*</span></label>
+                    <input
+                      type="date"
+                      v-model="form.expense_date"
+                      class="form-control"
+                      :class="{ 'is-invalid': form.errors.expense_date }"
+                    />
+                    <div v-if="form.errors.expense_date" class="invalid-feedback">
+                      {{ form.errors.expense_date }}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label>Danh mục <span class="text-danger">*</span></label>
+                    <select
+                      v-model="form.category_id"
+                      class="form-control"
+                      :class="{ 'is-invalid': form.errors.category_id }"
+                    >
+                      <option value="">-- Chọn danh mục --</option>
+                      <option v-for="category in categories" :key="category.id" :value="category.id">
+                        {{ category.name }}
+                      </option>
+                    </select>
+                    <div v-if="form.errors.category_id" class="invalid-feedback">
+                      {{ form.errors.category_id }}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label>Dự án</label>
+                    <select v-model="form.project_id" class="form-control" :class="{ 'is-invalid': form.errors.project_id }">
+                      <option value="">-- Chọn dự án (nếu có) --</option>
+                      <option v-for="project in projects" :key="project.id" :value="project.id">
+                        {{ project.name }}
+                      </option>
+                    </select>
+                    <div v-if="form.errors.project_id" class="invalid-feedback">
+                      {{ form.errors.project_id }}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label>Số tiền <span class="text-danger">*</span></label>
+                    <input
+                      type="text"
+                      :value="formatNumber(form.amount)"
+                      @input="handleAmountInput"
+                      class="form-control"
+                      :class="{ 'is-invalid': form.errors.amount }"
+                      placeholder="0"
+                    />
+                    <div v-if="form.errors.amount" class="invalid-feedback">
+                      {{ form.errors.amount }}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label>Người nhận <span class="text-danger">*</span></label>
+                    <input
+                      type="text"
+                      v-model="form.recipient"
+                      class="form-control"
+                      :class="{ 'is-invalid': form.errors.recipient }"
+                      placeholder="Nhập tên người nhận"
+                    />
+                    <div v-if="form.errors.recipient" class="invalid-feedback">
+                      {{ form.errors.recipient }}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <label>Nội dung <span class="text-danger">*</span></label>
+                    <textarea
+                      v-model="form.description"
+                      class="form-control"
+                      :class="{ 'is-invalid': form.errors.description }"
+                      rows="4"
+                      placeholder="Nhập nội dung chi tiết"
+                    ></textarea>
+                    <div v-if="form.errors.description" class="invalid-feedback">
+                      {{ form.errors.description }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-footer">
+              <button type="submit" class="btn btn-primary" :disabled="form.processing">
+                <i class="fas fa-save"></i> Lưu phiếu chi
+              </button>
+              <a @click.prevent="router.visit(route('expense-vouchers.index'))" class="btn btn-secondary ml-2">
+                <i class="fas fa-times"></i> Hủy
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </AdminLayout>
+</template>

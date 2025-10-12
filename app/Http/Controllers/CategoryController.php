@@ -12,8 +12,8 @@ class CategoryController extends Controller
     {
         // Tất cả user trừ admin có thể truy cập
         $this->middleware(function ($request, $next) {
-            if (auth()->user()->hasRole('admin')) {
-                abort(403, 'Admin không có quyền truy cập chức năng này');
+            if (!auth()->user()->hasRole('admin')) {
+                abort(403, 'Bạn không có quyền truy cập chức năng này');
             }
             return $next($request);
         });
@@ -73,7 +73,7 @@ class CategoryController extends Controller
 
         Category::create($validated);
 
-        return redirect()->route('categories.index')
+        return redirect()->route('admin.categories.index')
             ->with('success', 'Danh mục đã được tạo thành công!');
     }
 
@@ -97,7 +97,7 @@ class CategoryController extends Controller
     public function edit(Category $category)
     {
         $category->loadCount('paymentRequests');
-        
+
         return Inertia::render('Categories/Edit', [
             'category' => $category,
         ]);
@@ -117,7 +117,7 @@ class CategoryController extends Controller
 
         $category->update($validated);
 
-        return redirect()->route('categories.index')
+        return redirect()->route('admin.categories.index')
             ->with('success', 'Danh mục đã được cập nhật thành công!');
     }
 
@@ -133,7 +133,7 @@ class CategoryController extends Controller
 
         $category->delete();
 
-        return redirect()->route('categories.index')
+        return redirect()->route('admin.categories.index')
             ->with('success', 'Danh mục đã được xóa thành công!');
     }
 }

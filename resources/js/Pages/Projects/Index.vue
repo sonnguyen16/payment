@@ -42,7 +42,7 @@ const getStatusLabel = (status) => {
 
 const applyFilters = () => {
   router.get(
-    route('projects.index'),
+    route('admin.projects.index'),
     {
       search: search.value,
       status: status.value
@@ -57,7 +57,7 @@ const applyFilters = () => {
 const clearFilters = () => {
   search.value = ''
   status.value = ''
-  router.get(route('projects.index'))
+  router.get(route('admin.projects.index'))
 }
 </script>
 
@@ -91,7 +91,7 @@ const clearFilters = () => {
               </div>
               <div class="col-md-5 d-flex gap-3">
                 <button @click="clearFilters" class="btn btn-secondary"><i class="fas fa-times"></i> Xóa bộ lọc</button>
-                <Link v-if="can.create" :href="route('projects.create')" class="btn btn-primary">
+                <Link v-if="can.create" :href="route('admin.projects.create')" class="btn btn-primary">
                   <i class="fas fa-plus"></i> Tạo dự án mới
                 </Link>
               </div>
@@ -105,58 +105,64 @@ const clearFilters = () => {
             <h3 class="card-title">Danh sách dự án</h3>
           </div>
           <div class="card-body p-0">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th style="width: 50px">STT</th>
-                  <th>Tên dự án</th>
-                  <th>Mã dự án</th>
-                  <th>Ngân sách</th>
-                  <th>Đã chi</th>
-                  <th>Còn lại</th>
-                  <th>Trạng thái</th>
-                  <th>Số phiếu</th>
-                  <th style="width: 100px">Thao tác</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(project, index) in projects.data" :key="project.id">
-                  <td class="text-center">{{ projects.from + index }}</td>
-                  <td>
-                    <Link :href="route('projects.show', project.id)" class="text-primary">
-                      {{ project.name }}
-                    </Link>
-                  </td>
-                  <td>{{ project.code }}</td>
-                  <td>{{ formatMoney(project.budget) }}</td>
-                  <td>{{ formatMoney(project.spent) }}</td>
-                  <td>
-                    <span :class="project.is_over_budget ? 'text-danger' : 'text-success'">
-                      {{ formatMoney(project.budget - project.spent) }}
-                    </span>
-                  </td>
-                  <td>
-                    <span class="badge" :class="getStatusBadge(project.status)">
-                      {{ getStatusLabel(project.status) }}
-                    </span>
-                  </td>
-                  <td class="text-center">{{ project.payment_requests_count || 0 }}</td>
-                  <td>
-                    <div class="btn-group">
-                      <Link :href="route('projects.show', project.id)" class="btn btn-sm btn-primary">
-                        <i class="fas fa-eye"></i>
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 50px">STT</th>
+                    <th>Tên dự án</th>
+                    <th>Mã dự án</th>
+                    <th>Ngân sách</th>
+                    <th>Đã chi</th>
+                    <th>Còn lại</th>
+                    <th>Trạng thái</th>
+                    <th>Số phiếu</th>
+                    <th style="width: 100px">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(project, index) in projects.data" :key="project.id">
+                    <td class="text-center">{{ projects.from + index }}</td>
+                    <td>
+                      <Link :href="route('admin.projects.show', project.id)" class="text-primary">
+                        {{ project.name }}
                       </Link>
-                      <Link v-if="can.update" :href="route('projects.edit', project.id)" class="btn btn-sm btn-info">
-                        <i class="fas fa-edit"></i>
-                      </Link>
-                    </div>
-                  </td>
-                </tr>
-                <tr v-if="projects.data.length === 0">
-                  <td colspan="10" class="text-center text-muted"><i class="fas fa-inbox"></i> Chưa có dự án nào</td>
-                </tr>
-              </tbody>
-            </table>
+                    </td>
+                    <td>{{ project.code }}</td>
+                    <td class="text-right">{{ formatMoney(project.budget) }}</td>
+                    <td class="text-right">{{ formatMoney(project.spent) }}</td>
+                    <td class="text-right">
+                      <span :class="project.is_over_budget ? 'text-danger' : 'text-success'">
+                        {{ formatMoney(project.budget - project.spent) }}
+                      </span>
+                    </td>
+                    <td class="text-center">
+                      <span class="badge" :class="getStatusBadge(project.status)">
+                        {{ getStatusLabel(project.status) }}
+                      </span>
+                    </td>
+                    <td class="text-center">{{ project.payment_requests_count || 0 }}</td>
+                    <td class="text-center">
+                      <div class="btn-group">
+                        <Link :href="route('admin.projects.show', project.id)" class="btn btn-sm btn-primary">
+                          <i class="fas fa-eye"></i>
+                        </Link>
+                        <Link
+                          v-if="can.update"
+                          :href="route('admin.projects.edit', project.id)"
+                          class="btn btn-sm btn-info"
+                        >
+                          <i class="fas fa-edit"></i>
+                        </Link>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr v-if="projects.data.length === 0">
+                    <td colspan="10" class="text-center text-muted"><i class="fas fa-inbox"></i> Chưa có dự án nào</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
           <Pagination :links="projects.links" :meta="projects.meta" />
         </div>

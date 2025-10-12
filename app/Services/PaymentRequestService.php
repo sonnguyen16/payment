@@ -43,6 +43,9 @@ class PaymentRequestService
     public function update(PaymentRequest $paymentRequest, array $data, string $reason): PaymentRequest
     {
         return DB::transaction(function () use ($paymentRequest, $data, $reason) {
+            // Load old details before updating
+            $oldDetails = $paymentRequest->details()->get()->toArray();
+            
             // Extract details before updating payment request
             $details = $data['details'];
             unset($data['details']);
@@ -52,15 +55,21 @@ class PaymentRequestService
             $data['amount'] = $totalAmount;
             $data['description'] = collect($details)->pluck('description')->join('; ');
             
+            // Track changes for main fields
             $changes = [];
             foreach ($data as $key => $value) {
                 if ($paymentRequest->{$key} != $value) {
-                    $changes[] = [
-                        'field' => $key,
-                        'old_value' => $paymentRequest->{$key},
-                        'new_value' => $value,
+                    $changes[$key] = [
+                        'old' => $this->formatChangeValue($key, $paymentRequest->{$key}),
+                        'new' => $this->formatChangeValue($key, $value),
                     ];
                 }
+            }
+            
+            // Track details changes
+            $detailsChanges = $this->compareDetails($oldDetails, $details);
+            if (!empty($detailsChanges)) {
+                $changes['details'] = ['details' => $detailsChanges];
             }
             
             $paymentRequest->update($data);
@@ -71,10 +80,110 @@ class PaymentRequestService
                 $paymentRequest->details()->create($detail);
             }
             
+            // Save to update_histories
+            if (!empty($changes)) {
+                $paymentRequest->updateHistories()->create([
+                    'user_id' => auth()->id(),
+                    'reason' => $reason,
+                    'changes' => json_encode($changes),
+                ]);
+            }
+            
             event(new PaymentRequestUpdated($paymentRequest, $changes, $reason));
             
             return $paymentRequest;
         });
+    }
+    
+    protected function compareDetails(array $oldDetails, array $newDetails): array
+    {
+        $changes = [
+            'added' => [],
+            'removed' => [],
+            'modified' => [],
+        ];
+        
+        // Find added and modified
+        foreach ($newDetails as $index => $newDetail) {
+            $oldDetail = $oldDetails[$index] ?? null;
+            
+            if (!$oldDetail) {
+                // New detail added
+                $changes['added'][] = $newDetail;
+            } else {
+                // Check if modified
+                $isModified = false;
+                $modifications = [
+                    'old' => [],
+                    'new' => [],
+                ];
+                
+                foreach (['description', 'amount_before_tax', 'tax_amount', 'total_amount', 'invoice_number'] as $field) {
+                    if ($oldDetail[$field] != $newDetail[$field]) {
+                        $isModified = true;
+                        $modifications['old'][$field] = $oldDetail[$field];
+                        $modifications['new'][$field] = $newDetail[$field];
+                    } else {
+                        $modifications['old'][$field] = $oldDetail[$field];
+                        $modifications['new'][$field] = $newDetail[$field];
+                    }
+                }
+                
+                if ($isModified) {
+                    $changes['modified'][] = $modifications;
+                }
+            }
+        }
+        
+        // Find removed
+        if (count($oldDetails) > count($newDetails)) {
+            for ($i = count($newDetails); $i < count($oldDetails); $i++) {
+                $changes['removed'][] = $oldDetails[$i];
+            }
+        }
+        
+        // Remove empty arrays
+        $changes = array_filter($changes, function($value) {
+            return !empty($value);
+        });
+        
+        return $changes;
+    }
+    
+    protected function formatChangeValue(string $field, $value): string
+    {
+        if ($value === null) {
+            return 'Trống';
+        }
+        
+        // Format category_id
+        if ($field === 'category_id' && $value) {
+            $category = \App\Models\Category::find($value);
+            return $category ? $category->name : $value;
+        }
+        
+        // Format project_id
+        if ($field === 'project_id' && $value) {
+            $project = \App\Models\Project::find($value);
+            return $project ? $project->name : $value;
+        }
+        
+        // Format priority
+        if ($field === 'priority') {
+            return $value === 'urgent' ? 'Gấp' : 'Bình thường';
+        }
+        
+        // Format date
+        if ($field === 'expected_date' && $value) {
+            return \Carbon\Carbon::parse($value)->format('d/m/Y');
+        }
+        
+        // Format money
+        if ($field === 'amount' && $value) {
+            return number_format($value, 0, ',', '.') . ' ₫';
+        }
+        
+        return (string) $value;
     }
 
     public function submit(PaymentRequest $paymentRequest): PaymentRequest

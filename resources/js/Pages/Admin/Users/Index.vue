@@ -112,43 +112,45 @@ const clearFilters = () => {
             <h3 class="card-title">Danh sách người dùng</h3>
           </div>
           <div class="card-body p-0">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th style="width: 50px">STT</th>
-                  <th>Tên</th>
-                  <th>Email</th>
-                  <th>Vai trò</th>
-                  <th>Văn phòng</th>
-                  <th>Bộ phận</th>
-                  <th>Thao tác</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(user, index) in users.data" :key="user.id">
-                  <td class="text-center">{{ users.from + index }}</td>
-                  <td>{{ user.name }}</td>
-                  <td>{{ user.email }}</td>
-                  <td>
-                    <span
-                      v-for="role in user.roles"
-                      :key="role.id"
-                      class="badge mr-1"
-                      :class="getRoleBadgeClass(role.name)"
-                    >
-                      {{ getRoleLabel(role.name) }}
-                    </span>
-                  </td>
-                  <td>{{ user.office?.name || '-' }}</td>
-                  <td>{{ user.department?.name || '-' }}</td>
-                  <td>
-                    <Link :href="route('admin.users.edit', user.id)" class="btn btn-sm btn-warning">
-                      <i class="fas fa-edit"></i>
-                    </Link>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 50px">STT</th>
+                    <th>Tên</th>
+                    <th>Email</th>
+                    <th>Vai trò</th>
+                    <th>Văn phòng</th>
+                    <th>Bộ phận</th>
+                    <th>Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(user, index) in users.data" :key="user.id">
+                    <td class="text-center">{{ users.from + index }}</td>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td class="text-center">
+                      <span
+                        v-for="role in user.roles"
+                        :key="role.id"
+                        class="badge mr-1"
+                        :class="getRoleBadgeClass(role.name)"
+                      >
+                        {{ getRoleLabel(role.name) }}
+                      </span>
+                    </td>
+                    <td>{{ user.office?.name || '-' }}</td>
+                    <td>{{ user.department?.name || '-' }}</td>
+                    <td class="text-center">
+                      <Link :href="route('admin.users.edit', user.id)" class="btn btn-sm btn-warning">
+                        <i class="fas fa-edit"></i>
+                      </Link>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
           <Pagination :links="users.links" :meta="users.meta" />
         </div>

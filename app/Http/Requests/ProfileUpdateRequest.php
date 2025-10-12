@@ -20,4 +20,22 @@ class ProfileUpdateRequest extends FormRequest
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($this->user()->id)],
         ];
     }
+
+    /**
+     * Get custom messages for validator errors.
+     */
+    public function messages(): array
+    {
+        return [
+            'name.required' => 'Vui lòng nhập tên',
+            'name.string' => 'Tên phải là chuỗi ký tự',
+            'name.max' => 'Tên không được quá 255 ký tự',
+            'email.required' => 'Vui lòng nhập email',
+            'email.string' => 'Email phải là chuỗi ký tự',
+            'email.lowercase' => 'Email phải viết thường',
+            'email.email' => 'Email không hợp lệ',
+            'email.max' => 'Email không được quá 255 ký tự',
+            'email.unique' => 'Email đã được sử dụng',
+        ];
+    }
 }

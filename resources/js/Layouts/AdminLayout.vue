@@ -1,16 +1,17 @@
 <template>
   <div class="wrapper">
     <!-- Navbar -->
-    <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+    <nav class="main-header navbar navbar-expand navbar-light">
       <!-- Left navbar links -->
       <ul class="navbar-nav">
-        <!-- <li class="nav-item">
+        <li class="nav-item block lg:hidden">
           <a class="nav-link" data-widget="pushmenu" href="#" role="button">
             <i class="fas fa-bars"></i>
           </a>
-        </li> -->
-        <li>
-          <h2 class="text-lg text-gray-500 ms-3">Quản lý thu chi</h2>
+        </li>
+        <li class="flex items-center gap-2">
+          <img src="/logo.png" alt="Logo" class="w-10 h-10 ms-3" />
+          <h2 class="text-lg text-gray-500 hidden lg:block">Chấn Hưng Ltd</h2>
         </li>
       </ul>
 
@@ -30,7 +31,7 @@
     <!-- Main Sidebar -->
     <aside class="main-sidebar border-gray-500">
       <!-- Sidebar -->
-      <div class="sidebar">
+      <div class="sidebar sidebar-light">
         <!-- Sidebar Menu -->
         <nav class="mt-2">
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
@@ -50,6 +51,16 @@
                 <p>Phiếu đề xuất</p>
               </Link>
             </li>
+            <li class="nav-item" v-if="!isAdmin">
+              <Link
+                :href="route('expense-vouchers.index')"
+                class="nav-link"
+                :class="{ active: $page.component.startsWith('ExpenseVouchers') }"
+              >
+                <i class="nav-icon fas fa-receipt"></i>
+                <p>Phiếu chi</p>
+              </Link>
+            </li>
             <li class="nav-item" v-if="canApprove && !isAdmin">
               <Link
                 :href="route('approvals.index')"
@@ -60,27 +71,16 @@
                 <p>Phê duyệt</p>
               </Link>
             </li>
-            <li class="nav-item" v-if="!isAdmin">
+            <li class="nav-item" v-if="canViewReports && !isAdmin">
               <Link
-                :href="route('projects.index')"
+                :href="route('reports.payment-requests')"
                 class="nav-link"
-                :class="{ active: $page.component.startsWith('Projects') }"
+                :class="{ active: $page.component.startsWith('Reports') }"
               >
-                <i class="nav-icon fas fa-project-diagram"></i>
-                <p>Dự án</p>
+                <i class="nav-icon fas fa-chart-bar"></i>
+                <p>Báo cáo</p>
               </Link>
             </li>
-            <li class="nav-item" v-if="!isAdmin">
-              <Link
-                :href="route('categories.index')"
-                class="nav-link"
-                :class="{ active: $page.component.startsWith('Categories') }"
-              >
-                <i class="nav-icon fas fa-tags"></i>
-                <p>Danh mục</p>
-              </Link>
-            </li>
-
             <!-- Admin Menu -->
             <li class="nav-item" v-if="isAdmin">
               <Link
@@ -112,6 +112,26 @@
                 <p>Bộ phận</p>
               </Link>
             </li>
+            <li class="nav-item" v-if="isAdmin">
+              <Link
+                :href="route('admin.projects.index')"
+                class="nav-link"
+                :class="{ active: $page.component.startsWith('Projects') }"
+              >
+                <i class="nav-icon fas fa-project-diagram"></i>
+                <p>Dự án</p>
+              </Link>
+            </li>
+            <li class="nav-item" v-if="isAdmin">
+              <Link
+                :href="route('admin.categories.index')"
+                class="nav-link"
+                :class="{ active: $page.component.startsWith('Categories') }"
+              >
+                <i class="nav-icon fas fa-tags"></i>
+                <p>Danh mục</p>
+              </Link>
+            </li>
           </ul>
         </nav>
       </div>
@@ -124,7 +144,7 @@
 
     <!-- Footer -->
     <footer class="main-footer">
-      <strong>Quản lý thu chi &copy; 2025</strong>
+      <strong class="text-[12px] md:text-md">Copyright &copy; 2025 Chan Hung Corporation. All Rights Reserved</strong>
     </footer>
   </div>
 </template>
@@ -138,6 +158,11 @@ const page = usePage()
 const canApprove = computed(() => {
   const user = page.props.auth.user
   return user?.roles?.some((role) => ['department_head', 'accountant', 'ceo'].includes(role.name)) || false
+})
+
+const canViewReports = computed(() => {
+  const user = page.props.auth.user
+  return user?.roles?.some((role) => ['accountant', 'ceo'].includes(role.name)) || false
 })
 
 const isAdmin = computed(() => {

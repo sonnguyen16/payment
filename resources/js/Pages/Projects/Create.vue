@@ -13,7 +13,7 @@ const form = useForm({
 })
 
 const submit = () => {
-  form.post(route('projects.store'))
+  form.post(route('admin.projects.store'))
 }
 </script>
 
@@ -155,7 +155,7 @@ const submit = () => {
                     <i class="fas fa-save"></i>
                     {{ form.processing ? 'Đang lưu...' : 'Tạo dự án' }}
                   </button>
-                  <Link :href="route('projects.index')" class="btn btn-secondary ml-2"> Hủy </Link>
+                  <Link :href="route('admin.projects.index')" class="btn btn-secondary ml-2"> Hủy </Link>
                 </div>
               </form>
             </div>

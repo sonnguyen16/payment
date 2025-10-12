@@ -118,7 +118,8 @@ class PaymentRequestController extends Controller
             'category',
             'details',
             'documents.uploader',
-            'approvalHistories.user'
+            'approvalHistories.user',
+            'updateHistories.user'
         ]);
 
         return Inertia::render('PaymentRequests/Show', [
@@ -193,10 +194,7 @@ class PaymentRequestController extends Controller
     {
         $this->authorize('cancel', $paymentRequest);
 
-        $validated = $request->validate([
-        ]);
-
-        $this->paymentRequestService->cancel($paymentRequest, $validated['reason']);
+        $this->paymentRequestService->cancel($paymentRequest, $request->reason);
 
         return redirect()->route('payment-requests.index')
             ->with('success', 'Phiếu đã được hủy thành công!');

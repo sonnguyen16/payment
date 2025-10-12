@@ -36,10 +36,18 @@ class DocumentUploadRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'file.required' => 'Vui lòng chọn file',
+            // Single file
             'file.file' => 'File không hợp lệ',
             'file.mimes' => 'File phải là: PDF, DOC, DOCX, XLS, XLSX, JPG, JPEG, PNG',
             'file.max' => 'File không được vượt quá 10MB',
+            
+            // Multiple files
+            'files.array' => 'Danh sách file không hợp lệ',
+            'files.*.file' => 'File không hợp lệ',
+            'files.*.mimes' => 'File phải là: PDF, DOC, DOCX, XLS, XLSX, JPG, JPEG, PNG',
+            'files.*.max' => 'Mỗi file không được vượt quá 10MB',
+            
+            // Type
             'type.required' => 'Vui lòng chọn loại tài liệu',
             'type.in' => 'Loại tài liệu không hợp lệ',
         ];

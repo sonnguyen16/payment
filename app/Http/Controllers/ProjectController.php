@@ -66,7 +66,7 @@ class ProjectController extends Controller
     {
         $project = Project::create($request->validated());
 
-        return redirect()->route('projects.index')
+        return redirect()->route('admin.projects.index')
             ->with('success', 'Dự án đã được tạo thành công');
     }
 
@@ -108,7 +108,7 @@ class ProjectController extends Controller
     {
         $project->update($request->validated());
 
-        return redirect()->route('projects.index')
+        return redirect()->route('admin.projects.index')
             ->with('success', 'Dự án đã được cập nhật thành công');
     }
 
@@ -127,7 +127,7 @@ class ProjectController extends Controller
 
         $project->delete();
 
-        return redirect()->route('projects.index')
+        return redirect()->route('admin.projects.index')
             ->with('success', 'Dự án đã được xóa thành công');
     }
 }

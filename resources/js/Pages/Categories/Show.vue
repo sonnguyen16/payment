@@ -28,10 +28,10 @@ const formatDate = (date) => {
         <div class="row mb-2">
           <div class="col-sm-6">
             <div class="">
-              <Link :href="route('categories.edit', category.id)" class="btn btn-warning mr-2">
+              <Link :href="route('admin.categories.edit', category.id)" class="btn btn-warning mr-2">
                 <i class="fas fa-edit"></i> Chỉnh sửa
               </Link>
-              <Link :href="route('categories.index')" class="btn btn-secondary">
+              <Link :href="route('admin.categories.index')" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Quay lại
               </Link>
             </div>
@@ -105,9 +105,9 @@ const formatDate = (date) => {
                     <tr v-for="request in category.payment_requests" :key="request.id">
                       <td>#{{ request.id }}</td>
                       <td>{{ request.user.name }}</td>
-                      <td>{{ formatMoney(request.amount) }}</td>
-                      <td><StatusBadge :status="request.status" /></td>
-                      <td>{{ formatDate(request.created_at) }}</td>
+                      <td class="text-right">{{ formatMoney(request.amount) }}</td>
+                      <td class="text-center"><StatusBadge :status="request.status" /></td>
+                      <td class="text-center">{{ formatDate(request.created_at) }}</td>
                       <td>
                         <Link :href="route('payment-requests.show', request.id)" class="btn btn-sm btn-info">
                           <i class="fas fa-eye"></i>

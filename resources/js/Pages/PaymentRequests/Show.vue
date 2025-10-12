@@ -21,7 +21,15 @@ const formatDate = (date) => {
 }
 
 const formatDateTime = (datetime) => {
-  return new Date(datetime).toLocaleString('vi-VN')
+  const d = new Date(datetime)
+  const day = String(d.getDate()).padStart(2, '0')
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const year = d.getFullYear()
+  const hours = d.getHours()
+  const minutes = String(d.getMinutes()).padStart(2, '0')
+  const ampm = hours >= 12 ? 'PM' : 'AM'
+  const displayHours = hours % 12 || 12
+  return `${day}/${month}/${year} ${displayHours}:${minutes} ${ampm}`
 }
 
 const submitForApproval = async () => {
@@ -176,7 +184,38 @@ const canCancel = computed(() => {
 })
 
 const canUpdate = computed(() => {
-  return props.request.status === 'draft' || props.request.status === 'rejected'
+  // Chỉ cho phép sửa khi ở trạng thái draft
+  // Sau khi trưởng phòng duyệt (pending_accountant trở đi) thì không cho sửa nữa
+  return props.request.status === 'draft'
+})
+
+const getTotalBeforeTax = computed(() => {
+  if (!props.request.details || props.request.details.length === 0) return 0
+  return props.request.details.reduce((sum, detail) => sum + parseFloat(detail.amount_before_tax || 0), 0)
+})
+
+const getTotalTax = computed(() => {
+  if (!props.request.details || props.request.details.length === 0) return 0
+  return props.request.details.reduce((sum, detail) => sum + parseFloat(detail.tax_amount || 0), 0)
+})
+
+const getDocumentTypeLabel = (type) => {
+  const labels = {
+    invoice: 'Hóa đơn',
+    receipt: 'Biên lai',
+    contract: 'Hợp đồng',
+    other: 'Khác'
+  }
+  return labels[type] || type
+}
+
+// Format update_histories to add action field for ApprovalTimeline component
+const formattedUpdateHistories = computed(() => {
+  if (!props.request.update_histories) return []
+  return props.request.update_histories.map((history) => ({
+    ...history,
+    action: 'updated' // Add action field for timeline component
+  }))
 })
 </script>
 
@@ -210,7 +249,7 @@ const canUpdate = computed(() => {
               <div class="card-body">
                 <table class="table table-bordered">
                   <tr>
-                    <th width="30%">Danh mục</th>
+                    <th>Danh mục</th>
                     <td>
                       <div class="d-flex align-items-center" v-if="request.category">
                         <div class="category-indicator mr-2" :style="{ backgroundColor: request.category.color }"></div>
@@ -220,8 +259,8 @@ const canUpdate = computed(() => {
                     </td>
                   </tr>
                   <tr>
-                    <th>Tổng số tiền</th>
-                    <td class="text-danger font-weight-bold">{{ formatMoney(request.amount) }}</td>
+                    <th>Người đề xuất</th>
+                    <td>{{ request.user.name }}</td>
                   </tr>
                   <tr>
                     <th>Lý do</th>
@@ -230,6 +269,18 @@ const canUpdate = computed(() => {
                   <tr>
                     <th>Ngày dự kiến</th>
                     <td>{{ formatDate(request.expected_date) }}</td>
+                  </tr>
+                  <tr v-if="request.paid_at">
+                    <th>Ngày giải ngân</th>
+                    <td>{{ formatDateTime(request.paid_at) }}</td>
+                  </tr>
+                  <tr v-if="request.payment_code">
+                    <th>Mã TT</th>
+                    <td>{{ request.payment_code }}</td>
+                  </tr>
+                  <tr>
+                    <th>Tổng tiền</th>
+                    <td class="text-danger font-weight-bold">{{ formatMoney(request.amount) }}</td>
                   </tr>
                   <tr>
                     <th>Ưu tiên</th>
@@ -243,25 +294,22 @@ const canUpdate = computed(() => {
                     <th>Dự án</th>
                     <td>{{ request.project.name }} ({{ request.project.code }})</td>
                   </tr>
-                  <tr>
-                    <th>Người tạo</th>
-                    <td>{{ request.user.name }}</td>
-                  </tr>
+
                   <tr>
                     <th>Ngày tạo</th>
                     <td>{{ formatDateTime(request.created_at) }}</td>
                   </tr>
+                  <tr>
+                    <th width="15%">Trạng thái</th>
+                    <td>
+                      <span class="badge badge-lg" :class="getStatusBadgeClass(request.status)">
+                        {{ getStatusLabel(request.status) }}
+                      </span>
+                    </td>
+                  </tr>
                   <tr v-if="request.rejection_reason">
                     <th>Lý do từ chối</th>
                     <td class="text-danger">{{ request.rejection_reason }}</td>
-                  </tr>
-                  <tr v-if="request.payment_code">
-                    <th>Mã thanh toán</th>
-                    <td>{{ request.payment_code }}</td>
-                  </tr>
-                  <tr v-if="request.paid_at">
-                    <th>Ngày thanh toán</th>
-                    <td>{{ formatDateTime(request.paid_at) }}</td>
                   </tr>
                 </table>
               </div>
@@ -276,12 +324,12 @@ const canUpdate = computed(() => {
                 <table class="table" v-if="request.details && request.details.length > 0">
                   <thead>
                     <tr>
-                      <th style="width: 50px">STT</th>
+                      <th style="width: 40px">STT</th>
                       <th>Nội dung</th>
-                      <th style="width: 150px">Số tiền chưa thuế</th>
-                      <th style="width: 120px">Thuế GTGT</th>
-                      <th style="width: 150px">Tổng tiền</th>
-                      <th style="width: 120px">Số hóa đơn</th>
+                      <th style="width: 130px">Tiền chưa thuế</th>
+                      <th style="width: 100px">Thuế GTGT</th>
+                      <th style="width: 130px">Tổng tiền</th>
+                      <th style="width: 100px">Số HĐ</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -296,7 +344,9 @@ const canUpdate = computed(() => {
                   </tbody>
                   <tfoot>
                     <tr class="bg-light">
-                      <th colspan="4" class="text-right">Tổng cộng:</th>
+                      <th colspan="2" class="text-right">Tổng chưa thuế:</th>
+                      <th class="text-right">{{ formatMoney(getTotalBeforeTax) }}</th>
+                      <th class="text-right">{{ formatMoney(getTotalTax) }}</th>
                       <th class="text-right text-danger">{{ formatMoney(request.amount) }}</th>
                       <th></th>
                     </tr>
@@ -321,19 +371,6 @@ const canUpdate = computed(() => {
           </div>
 
           <div class="col-md-4">
-            <div class="card">
-              <div class="card-header">
-                <h3 class="card-title">Trạng thái</h3>
-              </div>
-              <div class="card-body text-center">
-                <h4>
-                  <span class="badge badge-lg" :class="getStatusBadgeClass(request.status)">
-                    {{ getStatusLabel(request.status) }}
-                  </span>
-                </h4>
-              </div>
-            </div>
-
             <!-- Actions -->
             <div class="card">
               <div class="card-header">
@@ -444,17 +481,30 @@ const canUpdate = computed(() => {
             <!-- Existing Documents -->
             <div class="card" v-if="request.documents && request.documents.length > 0">
               <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-paperclip"></i> Tài liệu đính kèm</h3>
+                <h3 class="card-title"><i class="fas fa-paperclip"></i> Tài liệu đã upload</h3>
               </div>
-              <div class="card-body">
-                <ul class="list-unstyled">
-                  <li v-for="doc in request.documents" :key="doc.id" class="mb-2">
-                    <a :href="route('documents.show', doc.id)" target="_blank" class="btn btn-sm btn-outline-primary">
-                      <i class="fas fa-download"></i> {{ doc.original_name }}
-                    </a>
-                    <small class="text-muted d-block">{{ doc.size_formatted }}</small>
-                  </li>
-                </ul>
+              <div class="card-body p-0">
+                <table class="table table-sm mb-0">
+                  <thead>
+                    <tr>
+                      <th style="width: 100px">Loại</th>
+                      <th>Tài liệu</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="doc in request.documents" :key="doc.id">
+                      <td class="text-center">
+                        <span class="badge badge-info">{{ getDocumentTypeLabel(doc.type) }}</span>
+                      </td>
+                      <td>
+                        <a :href="route('documents.show', doc.id)" target="_blank" class="text-primary">
+                          <i class="fas fa-download"></i> {{ doc.original_name }}
+                        </a>
+                        <small class="text-muted d-block">{{ doc.size_formatted }}</small>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>

@@ -59,7 +59,7 @@ class PaymentRequestPolicy
     {
         // Only creator can update, and only if draft or rejected
         return $user->id === $paymentRequest->user_id
-            && in_array($paymentRequest->status->value, ['draft', 'rejected']);
+            && in_array($paymentRequest->status->value, ['draft', 'rejected', 'pending_department_head']);
     }
 
     /**

@@ -7,10 +7,12 @@ use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\ExpenseVoucherController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentRequestController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ReportController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -37,12 +39,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
-    // Projects
-    Route::resource('projects', ProjectController::class);
-    
-    // Categories
-    Route::resource('categories', CategoryController::class);
-    
     // Payment Requests
     Route::resource('payment-requests', PaymentRequestController::class);
     Route::post('payment-requests/{paymentRequest}/submit', [PaymentRequestController::class, 'submit'])
@@ -61,6 +57,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('approvals/{paymentRequest}/reject', [ApprovalController::class, 'reject'])
         ->name('approvals.reject');
     
+    // Expense Vouchers
+    Route::resource('expense-vouchers', ExpenseVoucherController::class);
+    
     // Documents
     Route::post('payment-requests/{paymentRequest}/documents', [DocumentController::class, 'store'])
         ->name('documents.store');
@@ -69,20 +68,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('documents/{document}', [DocumentController::class, 'destroy'])
         ->name('documents.destroy');
     
-    // Projects
-    Route::resource('projects', ProjectController::class);
-    
     // Notifications
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::get('notifications/unread', [NotificationController::class, 'unread'])->name('notifications.unread');
     Route::post('notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::post('notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
     
+    // Reports (only for accountant and ceo)
+    Route::get('reports/payment-requests', [ReportController::class, 'paymentRequests'])
+        ->name('reports.payment-requests')
+        ->middleware('role:accountant|ceo');
+    
     // Admin Routes (only for admin role)
     Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
         Route::resource('users', AdminUserController::class);
         Route::resource('offices', AdminOfficeController::class);
         Route::resource('departments', AdminDepartmentController::class);
+        Route::resource('projects', ProjectController::class);
+        Route::resource('categories', CategoryController::class);
     });
     
     // Profile

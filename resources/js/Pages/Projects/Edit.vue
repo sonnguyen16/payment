@@ -18,7 +18,7 @@ const form = useForm({
 })
 
 const submit = () => {
-  form.put(route('projects.update', props.project.data.id))
+  form.put(route('admin.projects.update', props.project.data.id))
 }
 </script>
 
@@ -160,7 +160,9 @@ const submit = () => {
                     <i class="fas fa-save"></i>
                     {{ form.processing ? 'Đang lưu...' : 'Cập nhật' }}
                   </button>
-                  <Link :href="route('projects.show', project.data.id)" class="btn btn-secondary ml-2"> Hủy </Link>
+                  <Link :href="route('admin.projects.show', project.data.id)" class="btn btn-secondary ml-2">
+                    Hủy
+                  </Link>
                 </div>
               </form>
             </div>

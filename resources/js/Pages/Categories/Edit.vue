@@ -14,7 +14,7 @@ const form = useForm({
 })
 
 const submit = () => {
-  form.put(route('categories.update', props.category.id))
+  form.put(route('admin.categories.update', props.category.id))
 }
 </script>
 
@@ -42,7 +42,7 @@ const submit = () => {
                       :class="{ 'is-invalid': form.errors.name }"
                       placeholder="Nhập tên danh mục"
                       required
-                    >
+                    />
                     <div v-if="form.errors.name" class="invalid-feedback">
                       {{ form.errors.name }}
                     </div>
@@ -72,9 +72,9 @@ const submit = () => {
                         type="color"
                         class="form-control mr-3"
                         :class="{ 'is-invalid': form.errors.color }"
-                        style="width: 60px; height: 38px;"
+                        style="width: 60px; height: 38px"
                         required
-                      >
+                      />
                       <input
                         v-model="form.color"
                         type="text"
@@ -83,27 +83,18 @@ const submit = () => {
                         placeholder="#007bff"
                         pattern="^#[0-9A-Fa-f]{6}$"
                         maxlength="7"
-                      >
+                      />
                     </div>
                     <div v-if="form.errors.color" class="invalid-feedback">
                       {{ form.errors.color }}
                     </div>
-                    <small class="form-text text-muted">
-                      Chọn màu sắc để phân biệt danh mục
-                    </small>
+                    <small class="form-text text-muted"> Chọn màu sắc để phân biệt danh mục </small>
                   </div>
 
                   <div class="form-group">
                     <div class="custom-control custom-switch">
-                      <input
-                        id="is_active"
-                        v-model="form.is_active"
-                        type="checkbox"
-                        class="custom-control-input"
-                      >
-                      <label class="custom-control-label" for="is_active">
-                        Kích hoạt danh mục
-                      </label>
+                      <input id="is_active" v-model="form.is_active" type="checkbox" class="custom-control-input" />
+                      <label class="custom-control-label" for="is_active"> Kích hoạt danh mục </label>
                     </div>
                     <small class="form-text text-muted">
                       Chỉ những danh mục được kích hoạt mới hiển thị khi tạo phiếu
@@ -112,17 +103,11 @@ const submit = () => {
                 </div>
 
                 <div class="card-footer">
-                  <button
-                    type="submit"
-                    class="btn btn-primary"
-                    :disabled="form.processing"
-                  >
+                  <button type="submit" class="btn btn-primary" :disabled="form.processing">
                     <i class="fas fa-save"></i>
                     {{ form.processing ? 'Đang cập nhật...' : 'Cập nhật danh mục' }}
                   </button>
-                  <Link :href="route('categories.index')" class="btn btn-secondary ml-2">
-                    Hủy
-                  </Link>
+                  <Link :href="route('admin.categories.index')" class="btn btn-secondary ml-2"> Hủy </Link>
                 </div>
               </form>
             </div>
@@ -135,10 +120,7 @@ const submit = () => {
               </div>
               <div class="card-body">
                 <div class="d-flex align-items-center mb-3">
-                  <div
-                    class="color-indicator mr-3"
-                    :style="{ backgroundColor: form.color }"
-                  ></div>
+                  <div class="color-indicator mr-3" :style="{ backgroundColor: form.color }"></div>
                   <div>
                     <h5 class="mb-1">{{ form.name || 'Tên danh mục' }}</h5>
                     <p class="mb-0 text-muted">{{ form.description || 'Mô tả danh mục' }}</p>
@@ -160,7 +142,9 @@ const submit = () => {
               <div class="card-body">
                 <p><strong>Số phiếu sử dụng:</strong> {{ category.payment_requests_count || 0 }}</p>
                 <p><strong>Ngày tạo:</strong> {{ new Date(category.created_at).toLocaleDateString('vi-VN') }}</p>
-                <p><strong>Cập nhật lần cuối:</strong> {{ new Date(category.updated_at).toLocaleDateString('vi-VN') }}</p>
+                <p>
+                  <strong>Cập nhật lần cuối:</strong> {{ new Date(category.updated_at).toLocaleDateString('vi-VN') }}
+                </p>
               </div>
             </div>
           </div>
@@ -176,6 +160,6 @@ const submit = () => {
   height: 40px;
   border-radius: 50%;
   border: 2px solid #fff;
-  box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
 }
 </style>

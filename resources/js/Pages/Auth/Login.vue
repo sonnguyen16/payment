@@ -24,12 +24,11 @@ const submit = () => {
 
   <div class="login-page">
     <div class="login-box">
-      <div class="login-logo">QUẢN LÝ THU CHI</div>
-
       <div class="card">
         <div class="card-body login-card-body">
-          <p class="login-box-msg">Đăng nhập để bắt đầu phiên làm việc</p>
-
+          <div class="login-logo flex justify-center">
+            <img src="/logo.png" alt="Logo" class="w-24 h-24" />
+          </div>
           <div v-if="status" class="alert alert-success">
             {{ status }}
           </div>
@@ -98,7 +97,6 @@ const submit = () => {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
 .login-box {
@@ -124,6 +122,7 @@ const submit = () => {
 
 .login-card-body {
   padding: 20px;
+  border-radius: 10px;
 }
 
 .login-box-msg {

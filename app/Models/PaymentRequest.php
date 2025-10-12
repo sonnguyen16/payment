@@ -77,6 +77,11 @@ class PaymentRequest extends Model
         return $this->hasMany(PaymentRequestDetail::class);
     }
 
+    public function updateHistories(): HasMany
+    {
+        return $this->hasMany(UpdateHistory::class);
+    }
+
     // Scopes
     public function scopePending(Builder $query): Builder
     {
