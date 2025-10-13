@@ -16,7 +16,7 @@ class ExpenseVoucher extends Model
         'expense_date',
         'description',
         'amount',
-        'category_id',
+        'expense_category_id',
         'project_id',
         'user_id',
         'recipient',
@@ -38,9 +38,9 @@ class ExpenseVoucher extends Model
     /**
      * Get the category.
      */
-    public function category(): BelongsTo
+    public function expenseCategory(): BelongsTo
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(ExpenseCategory::class);
     }
 
     /**

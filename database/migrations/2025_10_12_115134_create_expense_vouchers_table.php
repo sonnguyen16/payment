@@ -16,7 +16,7 @@ return new class extends Migration
             $table->date('expense_date');
             $table->text('description');
             $table->decimal('amount', 15, 2);
-            $table->foreignId('category_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('expense_category_id')->constrained('expense_categories')->cascadeOnDelete();
             $table->foreignId('project_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete(); // Người tạo
             $table->string('recipient'); // Người nhận

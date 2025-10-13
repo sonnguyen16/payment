@@ -144,6 +144,27 @@ const uploadDocuments = () => {
   })
 }
 
+const deleteDocument = async (documentId) => {
+  const result = await Swal.fire({
+    title: 'Xác nhận xóa?',
+    text: 'Bạn có chắc muốn xóa tài liệu này?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Xóa',
+    cancelButtonText: 'Hủy'
+  })
+
+  if (result.isConfirmed) {
+    useForm({}).delete(route('documents.destroy', documentId), {
+      onSuccess: () => {
+        Swal.fire('Đã xóa!', 'Tài liệu đã được xóa.', 'success')
+      }
+    })
+  }
+}
+
 const getStatusLabel = (status) => {
   const labels = {
     draft: 'Nháp',
@@ -279,10 +300,6 @@ const formattedUpdateHistories = computed(() => {
                     <td>{{ request.payment_code }}</td>
                   </tr>
                   <tr>
-                    <th>Tổng tiền</th>
-                    <td class="text-danger font-weight-bold">{{ formatMoney(request.amount) }}</td>
-                  </tr>
-                  <tr>
                     <th>Ưu tiên</th>
                     <td>
                       <span class="badge" :class="request.priority === 'urgent' ? 'badge-danger' : 'badge-secondary'">
@@ -343,8 +360,8 @@ const formattedUpdateHistories = computed(() => {
                     </tr>
                   </tbody>
                   <tfoot>
-                    <tr class="bg-light">
-                      <th colspan="2" class="text-right">Tổng chưa thuế:</th>
+                    <tr class="bg-light font-weight-bold">
+                      <th colspan="2" class="text-right">TỔNG CỘNG:</th>
                       <th class="text-right">{{ formatMoney(getTotalBeforeTax) }}</th>
                       <th class="text-right">{{ formatMoney(getTotalTax) }}</th>
                       <th class="text-right text-danger">{{ formatMoney(request.amount) }}</th>
@@ -489,6 +506,7 @@ const formattedUpdateHistories = computed(() => {
                     <tr>
                       <th style="width: 100px">Loại</th>
                       <th>Tài liệu</th>
+                      <th style="width: 60px">Thao tác</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -504,6 +522,16 @@ const formattedUpdateHistories = computed(() => {
                           }}
                         </a>
                         <small class="text-muted d-block">{{ doc.size_formatted }}</small>
+                      </td>
+                      <td class="text-center">
+                        <button
+                          v-if="usePage().props.auth.user.id === request.user_id"
+                          @click="deleteDocument(doc.id)"
+                          class="btn btn-sm btn-danger"
+                          title="Xóa"
+                        >
+                          <i class="fas fa-trash"></i>
+                        </button>
                       </td>
                     </tr>
                   </tbody>

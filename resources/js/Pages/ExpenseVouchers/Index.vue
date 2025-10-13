@@ -154,9 +154,12 @@ const deleteVoucher = (voucher) => {
                     <td class="text-center">{{ formatDate(voucher.expense_date) }}</td>
                     <td>{{ voucher.description.substring(0, 50) }}...</td>
                     <td>
-                      <div class="d-flex align-items-center" v-if="voucher.category">
-                        <div class="category-indicator mr-2" :style="{ backgroundColor: voucher.category.color }"></div>
-                        {{ voucher.category.name }}
+                      <div class="d-flex align-items-center" v-if="voucher.expense_category">
+                        <div
+                          class="category-indicator mr-2"
+                          :style="{ backgroundColor: voucher.expense_category.color }"
+                        ></div>
+                        {{ voucher.expense_category.name }}
                       </div>
                       <span v-else class="text-muted">-</span>
                     </td>

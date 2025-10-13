@@ -1,6 +1,6 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue'
-import { Head, useForm } from '@inertiajs/vue3'
+import { Head, useForm, Link } from '@inertiajs/vue3'
 
 const props = defineProps({
   request: Object,
@@ -80,6 +80,18 @@ const getTotalAmount = () => {
   }, 0)
 }
 
+const getTotalBeforeTax = () => {
+  return form.details.reduce((sum, detail) => {
+    return sum + parseNumber(detail.amount_before_tax)
+  }, 0)
+}
+
+const getTotalTax = () => {
+  return form.details.reduce((sum, detail) => {
+    return sum + parseNumber(detail.tax_amount)
+  }, 0)
+}
+
 const submit = () => {
   form.put(route('payment-requests.update', props.request.id))
 }
@@ -118,19 +130,12 @@ const submit = () => {
                     <div v-if="form.errors.category_id" class="invalid-feedback">{{ form.errors.category_id }}</div>
                   </div>
                 </div>
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <label>Tổng số tiền (VNĐ)</label>
-                    <input :value="formatNumber(getTotalAmount())" type="text" class="form-control" readonly />
-                    <small class="text-muted">Tự động tính từ chi tiết bên dưới</small>
-                  </div>
-                </div>
               </div>
 
               <!-- Chi tiết thanh toán -->
               <div class="row">
                 <div class="col-12">
-                  <h5>Chi tiết thanh toán</h5>
+                  <h5 class="mb-2">Chi tiết thanh toán</h5>
                   <div class="table-responsive">
                     <table class="table table-bordered">
                       <thead>
@@ -209,9 +214,19 @@ const submit = () => {
                           </td>
                         </tr>
                       </tbody>
+                      <tfoot>
+                        <tr class="bg-light font-weight-bold">
+                          <th colspan="2" class="text-right">TỔNG CỘNG:</th>
+                          <th class="text-right">{{ formatNumber(getTotalBeforeTax()) }}</th>
+                          <th class="text-right">{{ formatNumber(getTotalTax()) }}</th>
+                          <th class="text-right text-danger">{{ formatNumber(getTotalAmount()) }}</th>
+                          <th></th>
+                          <th></th>
+                        </tr>
+                      </tfoot>
                     </table>
                   </div>
-                  <button @click="addDetail" type="button" class="btn btn-sm btn-success mb-3">
+                  <button @click="addDetail" type="button" class="btn btn-sm btn-success my-2">
                     <i class="fas fa-plus"></i> Thêm dòng
                   </button>
                 </div>
@@ -297,9 +312,9 @@ const submit = () => {
               <button type="submit" class="btn btn-primary" :disabled="form.processing">
                 <i class="fas fa-save"></i> Cập nhật phiếu
               </button>
-              <a @click.prevent="router.visit(route('payment-requests.index'))" class="btn btn-secondary ml-2">
+              <Link :href="route('payment-requests.index')" class="btn btn-secondary ml-2">
                 <i class="fas fa-times"></i> Hủy
-              </a>
+              </Link>
             </div>
           </form>
         </div>

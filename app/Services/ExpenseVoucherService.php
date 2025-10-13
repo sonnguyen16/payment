@@ -58,9 +58,9 @@ class ExpenseVoucherService
             return 'Trống';
         }
         
-        // Format category_id
-        if ($field === 'category_id' && $value) {
-            $category = \App\Models\Category::find($value);
+        // Format expense_category_id
+        if ($field === 'expense_category_id' && $value) {
+            $category = \App\Models\ExpenseCategory::find($value);
             return $category ? $category->name : $value;
         }
         

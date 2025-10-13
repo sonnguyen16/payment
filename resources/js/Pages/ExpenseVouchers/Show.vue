@@ -20,7 +20,15 @@ const formatDate = (date) => {
 }
 
 const formatDateTime = (datetime) => {
-  return new Date(datetime).toLocaleString('vi-VN')
+  const d = new Date(datetime)
+  const day = String(d.getDate()).padStart(2, '0')
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const year = d.getFullYear()
+  const hours = d.getHours()
+  const minutes = String(d.getMinutes()).padStart(2, '0')
+  const ampm = hours >= 12 ? 'PM' : 'AM'
+  const displayHours = hours % 12 || 12
+  return `${day}/${month}/${year} ${displayHours}:${minutes} ${ampm}`
 }
 
 const deleteVoucher = () => {
@@ -65,13 +73,13 @@ const deleteVoucher = () => {
         </div>
 
         <!-- Voucher Info -->
-        <div class="card">
+        <div class="card w-50">
           <div class="card-header">
             <h3 class="card-title">Thông tin phiếu chi</h3>
           </div>
           <div class="card-body">
             <div class="row">
-              <div class="col-md-6">
+              <div class="col-12">
                 <table class="table table-borderless">
                   <tr>
                     <th style="width: 150px">Ngày chi:</th>
@@ -80,9 +88,12 @@ const deleteVoucher = () => {
                   <tr>
                     <th>Danh mục:</th>
                     <td>
-                      <div class="d-flex align-items-center" v-if="voucher.category">
-                        <div class="category-indicator mr-2" :style="{ backgroundColor: voucher.category.color }"></div>
-                        {{ voucher.category.name }}
+                      <div class="d-flex align-items-center" v-if="voucher.expense_category">
+                        <div
+                          class="category-indicator mr-2"
+                          :style="{ backgroundColor: voucher.expense_category.color }"
+                        ></div>
+                        {{ voucher.expense_category.name }}
                       </div>
                       <span v-else class="text-muted">-</span>
                     </td>
@@ -95,10 +106,6 @@ const deleteVoucher = () => {
                     <th>Số tiền:</th>
                     <td class="text-primary font-weight-bold">{{ formatMoney(voucher.amount) }}</td>
                   </tr>
-                </table>
-              </div>
-              <div class="col-md-6">
-                <table class="table table-borderless">
                   <tr>
                     <th style="width: 150px">Người nhận:</th>
                     <td>{{ voucher.recipient }}</td>
@@ -115,14 +122,11 @@ const deleteVoucher = () => {
                     <th>Cập nhật:</th>
                     <td>{{ formatDateTime(voucher.updated_at) }}</td>
                   </tr>
+                  <tr>
+                    <th>Nội dung:</th>
+                    <td>{{ voucher.description }}</td>
+                  </tr>
                 </table>
-              </div>
-            </div>
-
-            <div class="row mt-3">
-              <div class="col-12">
-                <h5>Nội dung:</h5>
-                <p class="text-muted">{{ voucher.description }}</p>
               </div>
             </div>
           </div>
@@ -179,7 +183,7 @@ export default {
         expense_date: 'Ngày chi',
         description: 'Nội dung',
         amount: 'Số tiền',
-        category_id: 'Danh mục',
+        expense_category_id: 'Danh mục',
         project_id: 'Dự án',
         recipient: 'Người nhận'
       }

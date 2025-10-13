@@ -16,7 +16,7 @@ const form = useForm({
   expense_date: getTodayDate(),
   description: '',
   amount: '',
-  category_id: '',
+  expense_category_id: '',
   project_id: '',
   recipient: ''
 })
@@ -43,48 +43,48 @@ const submit = () => {
   <AdminLayout>
     <div class="content pt-3">
       <div class="container-fluid">
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title">Thông tin phiếu chi</h3>
-          </div>
-          <form @submit.prevent="submit">
-            <div class="card-body">
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <label>Ngày chi <span class="text-danger">*</span></label>
-                    <input
-                      type="date"
-                      v-model="form.expense_date"
-                      class="form-control"
-                      :class="{ 'is-invalid': form.errors.expense_date }"
-                    />
-                    <div v-if="form.errors.expense_date" class="invalid-feedback">
-                      {{ form.errors.expense_date }}
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Thông tin phiếu chi</h3>
+              </div>
+              <form @submit.prevent="submit">
+                <div class="card-body">
+                  <!-- Ngày chi (chiếm 1/2 chiều rộng) -->
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label>Ngày chi <span class="text-danger">*</span></label>
+                        <input
+                          type="date"
+                          v-model="form.expense_date"
+                          class="form-control"
+                          :class="{ 'is-invalid': form.errors.expense_date }"
+                        />
+                        <div v-if="form.errors.expense_date" class="invalid-feedback">
+                          {{ form.errors.expense_date }}
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div class="col-md-6">
+                  <!-- Nội dung -->
                   <div class="form-group">
-                    <label>Danh mục <span class="text-danger">*</span></label>
-                    <select
-                      v-model="form.category_id"
+                    <label>Nội dung <span class="text-danger">*</span></label>
+                    <textarea
+                      v-model="form.description"
                       class="form-control"
-                      :class="{ 'is-invalid': form.errors.category_id }"
-                    >
-                      <option value="">-- Chọn danh mục --</option>
-                      <option v-for="category in categories" :key="category.id" :value="category.id">
-                        {{ category.name }}
-                      </option>
-                    </select>
-                    <div v-if="form.errors.category_id" class="invalid-feedback">
-                      {{ form.errors.category_id }}
+                      :class="{ 'is-invalid': form.errors.description }"
+                      rows="4"
+                      placeholder="Nhập nội dung chi tiết"
+                    ></textarea>
+                    <div v-if="form.errors.description" class="invalid-feedback">
+                      {{ form.errors.description }}
                     </div>
                   </div>
-                </div>
 
-                <div class="col-md-6">
+                  <!-- Dự án -->
                   <div class="form-group">
                     <label>Dự án</label>
                     <select
@@ -101,9 +101,8 @@ const submit = () => {
                       {{ form.errors.project_id }}
                     </div>
                   </div>
-                </div>
 
-                <div class="col-md-6">
+                  <!-- Số tiền -->
                   <div class="form-group">
                     <label>Số tiền <span class="text-danger">*</span></label>
                     <input
@@ -118,9 +117,8 @@ const submit = () => {
                       {{ form.errors.amount }}
                     </div>
                   </div>
-                </div>
 
-                <div class="col-md-6">
+                  <!-- Người nhận -->
                   <div class="form-group">
                     <label>Người nhận <span class="text-danger">*</span></label>
                     <input
@@ -134,35 +132,37 @@ const submit = () => {
                       {{ form.errors.recipient }}
                     </div>
                   </div>
-                </div>
 
-                <div class="col-md-12">
+                  <!-- Danh mục -->
                   <div class="form-group">
-                    <label>Nội dung <span class="text-danger">*</span></label>
-                    <textarea
-                      v-model="form.description"
+                    <label>Danh mục <span class="text-danger">*</span></label>
+                    <select
+                      v-model="form.expense_category_id"
                       class="form-control"
-                      :class="{ 'is-invalid': form.errors.description }"
-                      rows="4"
-                      placeholder="Nhập nội dung chi tiết"
-                    ></textarea>
-                    <div v-if="form.errors.description" class="invalid-feedback">
-                      {{ form.errors.description }}
+                      :class="{ 'is-invalid': form.errors.expense_category_id }"
+                    >
+                      <option value="">-- Chọn danh mục --</option>
+                      <option v-for="category in categories" :key="category.id" :value="category.id">
+                        {{ category.name }}
+                      </option>
+                    </select>
+                    <div v-if="form.errors.expense_category_id" class="invalid-feedback">
+                      {{ form.errors.expense_category_id }}
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
 
-            <div class="card-footer">
-              <button type="submit" class="btn btn-primary" :disabled="form.processing">
-                <i class="fas fa-save"></i> Lưu phiếu chi
-              </button>
-              <a @click.prevent="router.visit(route('expense-vouchers.index'))" class="btn btn-secondary ml-2">
-                <i class="fas fa-times"></i> Hủy
-              </a>
+                <div class="card-footer">
+                  <button type="submit" class="btn btn-primary" :disabled="form.processing">
+                    <i class="fas fa-save"></i> Lưu phiếu chi
+                  </button>
+                  <a @click.prevent="router.visit(route('expense-vouchers.index'))" class="btn btn-secondary ml-2">
+                    <i class="fas fa-times"></i> Hủy
+                  </a>
+                </div>
+              </form>
             </div>
-          </form>
+          </div>
         </div>
       </div>
     </div>

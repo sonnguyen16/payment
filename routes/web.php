@@ -7,6 +7,7 @@ use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\ExpenseCategoryController;
 use App\Http\Controllers\ExpenseVoucherController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentRequestController;
@@ -86,6 +87,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('departments', AdminDepartmentController::class);
         Route::resource('projects', ProjectController::class);
         Route::resource('categories', CategoryController::class);
+        Route::resource('expense-categories', ExpenseCategoryController::class);
     });
     
     // Profile

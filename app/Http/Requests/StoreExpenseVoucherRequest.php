@@ -23,12 +23,12 @@ class StoreExpenseVoucherRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'expense_date' => 'required|date',
-            'description' => 'required|string|max:1000',
-            'amount' => 'required|numeric|min:0|max:999999999999',
-            'category_id' => 'required|exists:categories,id',
-            'project_id' => 'nullable|exists:projects,id',
-            'recipient' => 'required|string|max:255',
+            'expense_date' => ['required', 'date'],
+            'description' => ['required', 'string', 'max:1000'],
+            'amount' => ['required', 'numeric', 'min:0'],
+            'expense_category_id' => ['required', 'exists:expense_categories,id'],
+            'project_id' => ['nullable', 'exists:projects,id'],
+            'recipient' => ['required', 'string', 'max:255'],
         ];
     }
 
@@ -54,8 +54,8 @@ class StoreExpenseVoucherRequest extends FormRequest
             'amount.max' => 'Số tiền quá lớn',
             
             // Category
-            'category_id.required' => 'Vui lòng chọn danh mục',
-            'category_id.exists' => 'Danh mục không tồn tại',
+            'expense_category_id.required' => 'Vui lòng chọn danh mục',
+            'expense_category_id.exists' => 'Danh mục không tồn tại',
             
             // Project
             'project_id.exists' => 'Dự án không tồn tại',

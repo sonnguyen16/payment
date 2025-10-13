@@ -27,7 +27,7 @@ class ExpenseVoucherController extends Controller
     {
         $this->authorize('viewAny', ExpenseVoucher::class);
 
-        $query = ExpenseVoucher::with(['user', 'category', 'project']);
+        $query = ExpenseVoucher::with(['user', 'expenseCategory', 'project']);
 
         // Search filter
         if ($request->filled('search')) {
@@ -43,7 +43,7 @@ class ExpenseVoucherController extends Controller
 
         // Category filter
         if ($request->filled('category_id')) {
-            $query->where('category_id', $request->category_id);
+            $query->where('expense_category_id', $request->category_id);
         }
 
         // Project filter
@@ -64,7 +64,7 @@ class ExpenseVoucherController extends Controller
         return Inertia::render('ExpenseVouchers/Index', [
             'vouchers' => $vouchers,
             'filters' => $request->only(['search', 'category_id', 'project_id', 'start_date', 'end_date']),
-            'categories' => Category::where('is_active', true)->get(),
+            'categories' => \App\Models\ExpenseCategory::where('is_active', true)->get(),
             'projects' => Project::whereIn('status', ['active', 'planning'])->get(),
             'can' => [
                 'create' => auth()->user()->can('create', ExpenseVoucher::class),
@@ -80,7 +80,7 @@ class ExpenseVoucherController extends Controller
         $this->authorize('create', ExpenseVoucher::class);
 
         return Inertia::render('ExpenseVouchers/Create', [
-            'categories' => Category::where('is_active', true)->get(),
+            'categories' => \App\Models\ExpenseCategory::where('is_active', true)->get(),
             'projects' => Project::whereIn('status', ['active', 'planning'])->get(),
         ]);
     }
@@ -107,7 +107,7 @@ class ExpenseVoucherController extends Controller
 
         $expenseVoucher->load([
             'user',
-            'category',
+            'expenseCategory',
             'project',
             'updateHistories.user'
         ]);
@@ -128,11 +128,11 @@ class ExpenseVoucherController extends Controller
     {
         $this->authorize('update', $expenseVoucher);
 
-        $expenseVoucher->load(['category', 'project']);
+        $expenseVoucher->load(['expenseCategory', 'project']);
 
         return Inertia::render('ExpenseVouchers/Edit', [
             'voucher' => $expenseVoucher,
-            'categories' => Category::where('is_active', true)->get(),
+            'categories' => \App\Models\ExpenseCategory::where('is_active', true)->get(),
             'projects' => Project::whereIn('status', ['active', 'planning'])->get(),
         ]);
     }

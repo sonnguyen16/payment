@@ -36,48 +36,52 @@
         <nav class="mt-2">
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
             <li class="nav-item" v-if="!isAdmin">
-              <Link :href="route('dashboard')" class="nav-link" :class="{ active: $page.component === 'Dashboard' }">
-                <i class="nav-icon fas fa-tachometer-alt"></i>
+              <Link
+                :href="route('dashboard')"
+                class="nav-link flex items-center gap-2"
+                :class="{ active: $page.component === 'Dashboard' }"
+              >
+                <img src="/icon.png" class="nav-icon" style="width: 20px; height: 20px" alt="icon" />
                 <p>Dashboard</p>
               </Link>
             </li>
             <li class="nav-item" v-if="!isAdmin">
               <Link
                 :href="route('payment-requests.index')"
-                class="nav-link"
+                class="nav-link flex items-center gap-2"
                 :class="{ active: $page.component.startsWith('PaymentRequests') }"
               >
-                <i class="nav-icon fas fa-file-invoice"></i>
+                <img src="/icon.png" class="nav-icon" style="width: 20px; height: 20px" alt="icon" />
                 <p>Phiếu đề xuất</p>
               </Link>
             </li>
             <li class="nav-item" v-if="!isAdmin">
               <Link
                 :href="route('expense-vouchers.index')"
-                class="nav-link"
+                class="nav-link flex items-center gap-2"
                 :class="{ active: $page.component.startsWith('ExpenseVouchers') }"
               >
-                <i class="nav-icon fas fa-receipt"></i>
+                <img src="/icon.png" class="nav-icon" style="width: 20px; height: 20px" alt="icon" />
                 <p>Phiếu chi</p>
               </Link>
             </li>
             <li class="nav-item" v-if="canApprove && !isAdmin">
               <Link
                 :href="route('approvals.index')"
-                class="nav-link"
+                class="nav-link flex items-center gap-2"
                 :class="{ active: $page.component === 'Approvals/Index' }"
               >
-                <i class="nav-icon fas fa-check-circle"></i>
+                <img src="/icon.png" class="nav-icon" style="width: 20px; height: 20px" alt="icon" />
                 <p>Phê duyệt</p>
               </Link>
             </li>
             <li class="nav-item" v-if="canViewReports && !isAdmin">
               <Link
                 :href="route('reports.payment-requests')"
-                class="nav-link"
+                class="nav-link flex items-center gap-2"
                 :class="{ active: $page.component.startsWith('Reports') }"
               >
-                <i class="nav-icon fas fa-chart-bar"></i>
+                <img src="/icon.png" class="nav-icon" style="width: 20px; height: 20px" alt="icon" />
                 <p>Báo cáo</p>
               </Link>
             </li>
@@ -85,51 +89,61 @@
             <li class="nav-item" v-if="isAdmin">
               <Link
                 :href="route('admin.users.index')"
-                class="nav-link"
+                class="nav-link flex items-center gap-2"
                 :class="{ active: $page.component.startsWith('Admin/Users') }"
               >
-                <i class="nav-icon fas fa-users"></i>
+                <img src="/icon.png" class="nav-icon" style="width: 20px; height: 20px" alt="icon" />
                 <p>Người dùng</p>
               </Link>
             </li>
             <li class="nav-item" v-if="isAdmin">
               <Link
                 :href="route('admin.offices.index')"
-                class="nav-link"
+                class="nav-link flex items-center gap-2"
                 :class="{ active: $page.component.startsWith('Admin/Offices') }"
               >
-                <i class="nav-icon fas fa-building"></i>
+                <img src="/icon.png" class="nav-icon" style="width: 20px; height: 20px" alt="icon" />
                 <p>Văn phòng</p>
               </Link>
             </li>
             <li class="nav-item" v-if="isAdmin">
               <Link
                 :href="route('admin.departments.index')"
-                class="nav-link"
+                class="nav-link flex items-center gap-2"
                 :class="{ active: $page.component.startsWith('Admin/Departments') }"
               >
-                <i class="nav-icon fas fa-sitemap"></i>
+                <img src="/icon.png" class="nav-icon" style="width: 20px; height: 20px" alt="icon" />
                 <p>Bộ phận</p>
               </Link>
             </li>
             <li class="nav-item" v-if="isAdmin">
               <Link
                 :href="route('admin.projects.index')"
-                class="nav-link"
+                class="nav-link flex items-center gap-2"
                 :class="{ active: $page.component.startsWith('Projects') }"
               >
-                <i class="nav-icon fas fa-project-diagram"></i>
+                <img src="/icon.png" class="nav-icon" style="width: 20px; height: 20px" alt="icon" />
                 <p>Dự án</p>
               </Link>
             </li>
             <li class="nav-item" v-if="isAdmin">
               <Link
                 :href="route('admin.categories.index')"
-                class="nav-link"
+                class="nav-link flex items-center gap-2"
                 :class="{ active: $page.component.startsWith('Categories') }"
               >
-                <i class="nav-icon fas fa-tags"></i>
-                <p>Danh mục</p>
+                <img src="/icon.png" class="nav-icon" style="width: 20px; height: 20px" alt="icon" />
+                <p>Danh mục đề xuất</p>
+              </Link>
+            </li>
+            <li class="nav-item" v-if="isAdmin">
+              <Link
+                :href="route('admin.expense-categories.index')"
+                class="nav-link flex items-center gap-2"
+                :class="{ active: $page.component.startsWith('ExpenseCategories') }"
+              >
+                <img src="/icon.png" class="nav-icon" style="width: 20px; height: 20px" alt="icon" />
+                <p>Danh mục chi</p>
               </Link>
             </li>
           </ul>
