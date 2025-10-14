@@ -143,13 +143,10 @@ class ExpenseVoucherController extends Controller
     public function update(UpdateExpenseVoucherRequest $request, ExpenseVoucher $expenseVoucher)
     {
         $validated = $request->validated();
-        $updateReason = $validated['update_reason'];
-        unset($validated['update_reason']);
 
         $this->expenseVoucherService->update(
             $expenseVoucher,
-            $validated,
-            $updateReason
+            $validated
         );
 
         return redirect()->route('expense-vouchers.show', $expenseVoucher)

@@ -29,7 +29,25 @@ class LoginRequest extends FormRequest
         return [
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
+            'g-recaptcha-response' => ['required', function ($attribute, $value, $fail) {
+                $this->validateRecaptcha($value, $fail);
+            }],
         ];
+    }
+
+    /**
+     * Validate reCAPTCHA response
+     */
+    protected function validateRecaptcha($response, $fail): void
+    {
+        $secretKey = env('RECAPTCHA_SECRET_KEY', '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe'); // Test secret key
+        
+        $verifyResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret=' . $secretKey . '&response=' . $response . '&remoteip=' . $this->ip());
+        $responseData = json_decode($verifyResponse);
+        
+        if (!$responseData->success) {
+            $fail('Xác thực reCAPTCHA không thành công. Vui lòng thử lại.');
+        }
     }
 
     /**
@@ -43,6 +61,7 @@ class LoginRequest extends FormRequest
             'email.email' => 'Email không hợp lệ',
             'password.required' => 'Vui lòng nhập mật khẩu',
             'password.string' => 'Mật khẩu phải là chuỗi ký tự',
+            'g-recaptcha-response.required' => 'Vui lòng xác nhận bạn không phải là robot',
         ];
     }
 

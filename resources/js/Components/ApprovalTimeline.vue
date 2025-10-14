@@ -142,7 +142,7 @@ const getActionLabel = (action) => {
               <strong class="text-primary">{{ getFieldLabel(field) }}:</strong>
               <div class="ml-3 mt-2">
                 <!-- Các dòng đã thêm -->
-                <div v-if="change.details.added && change.details.added.length > 0" class="mb-2">
+                <div v-if="change.details.added && change.details.added.length > 0" class="mb-2 table-responsive">
                   <span class="badge badge-success">Đã thêm {{ change.details.added.length }} dòng</span>
                   <table class="table table-sm table-bordered mt-1">
                     <thead class="bg-success text-white">
@@ -166,7 +166,7 @@ const getActionLabel = (action) => {
                   </table>
                 </div>
                 <!-- Các dòng đã xóa -->
-                <div v-if="change.details.removed && change.details.removed.length > 0" class="mb-2">
+                <div v-if="change.details.removed && change.details.removed.length > 0" class="mb-2 table-responsive">
                   <span class="badge badge-danger">Đã xóa {{ change.details.removed.length }} dòng</span>
                   <table class="table table-sm table-bordered mt-1">
                     <thead class="bg-danger text-white">

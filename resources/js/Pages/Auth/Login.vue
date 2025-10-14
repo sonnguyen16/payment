@@ -1,5 +1,6 @@
 <script setup>
 import { Head, useForm } from '@inertiajs/vue3'
+import { onMounted, ref } from 'vue'
 
 defineProps({
   canResetPassword: Boolean,
@@ -9,12 +10,64 @@ defineProps({
 const form = useForm({
   email: '',
   password: '',
-  remember: false
+  remember: false,
+  'g-recaptcha-response': ''
 })
 
+const recaptchaLoaded = ref(false)
+const recaptchaWidgetId = ref(null)
+
+// Load reCAPTCHA script
+onMounted(() => {
+  if (!window.grecaptcha) {
+    const script = document.createElement('script')
+    script.src = 'https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoad&render=explicit'
+    script.async = true
+    script.defer = true
+    document.head.appendChild(script)
+
+    window.onRecaptchaLoad = () => {
+      recaptchaLoaded.value = true
+      renderRecaptcha()
+    }
+  } else {
+    recaptchaLoaded.value = true
+    renderRecaptcha()
+  }
+})
+
+const renderRecaptcha = () => {
+  if (window.grecaptcha && document.getElementById('recaptcha-container')) {
+    recaptchaWidgetId.value = window.grecaptcha.render('recaptcha-container', {
+      sitekey: import.meta.env.VITE_RECAPTCHA_SITE_KEY || '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
+      callback: onRecaptchaSuccess,
+      'expired-callback': onRecaptchaExpired
+    })
+  }
+}
+
+const onRecaptchaSuccess = (token) => {
+  form['g-recaptcha-response'] = token
+}
+
+const onRecaptchaExpired = () => {
+  form['g-recaptcha-response'] = ''
+}
+
 const submit = () => {
+  if (!form['g-recaptcha-response']) {
+    alert('Vui lòng xác nhận bạn không phải là robot!')
+    return
+  }
+
   form.post(route('login'), {
-    onFinish: () => form.reset('password')
+    onFinish: () => {
+      form.reset('password')
+      // Reset reCAPTCHA
+      if (window.grecaptcha && recaptchaWidgetId.value !== null) {
+        window.grecaptcha.reset(recaptchaWidgetId.value)
+      }
+    }
   })
 }
 </script>
@@ -77,9 +130,21 @@ const submit = () => {
               </div>
             </div>
 
+            <!-- reCAPTCHA -->
+            <div class="form-group d-flex justify-content-center">
+              <div id="recaptcha-container"></div>
+            </div>
+            <div v-if="form.errors['g-recaptcha-response']" class="text-danger small text-center mb-3">
+              {{ form.errors['g-recaptcha-response'] }}
+            </div>
+
             <div class="row">
               <div class="col-12">
-                <button type="submit" class="btn btn-primary btn-block" :disabled="form.processing">
+                <button
+                  type="submit"
+                  class="btn btn-primary btn-block"
+                  :disabled="form.processing || !form['g-recaptcha-response']"
+                >
                   <i class="fas fa-sign-in-alt"></i> Đăng nhập
                 </button>
               </div>

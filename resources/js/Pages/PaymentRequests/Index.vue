@@ -58,7 +58,7 @@ const clearFilters = () => {
       <div class="container-fluid">
         <div class="card">
           <div class="card-body">
-            <div class="row">
+            <div class="row sm:gap-0 gap-3">
               <div class="col-md-3">
                 <input
                   v-model="search"

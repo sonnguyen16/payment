@@ -247,10 +247,10 @@ const formattedUpdateHistories = computed(() => {
     <div class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1 class="m-0">Chi tiết phiếu #{{ request.id }}</h1>
+          <div class="col-6">
+            <h2 class="text-lg">Chi tiết phiếu #{{ request.id }}</h2>
           </div>
-          <div class="col-sm-6">
+          <div class="col-6">
             <Link :href="route('payment-requests.index')" class="btn btn-secondary float-right">
               <i class="fas fa-arrow-left"></i> Quay lại
             </Link>
@@ -338,37 +338,39 @@ const formattedUpdateHistories = computed(() => {
                 <h3 class="card-title">Chi tiết thanh toán</h3>
               </div>
               <div class="card-body p-0">
-                <table class="table" v-if="request.details && request.details.length > 0">
-                  <thead>
-                    <tr>
-                      <th style="width: 40px">STT</th>
-                      <th>Nội dung</th>
-                      <th style="width: 130px">Tiền chưa thuế</th>
-                      <th style="width: 100px">Thuế GTGT</th>
-                      <th style="width: 130px">Tổng tiền</th>
-                      <th style="width: 100px">Số HĐ</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="(detail, index) in request.details" :key="detail.id">
-                      <td class="text-center">{{ index + 1 }}</td>
-                      <td>{{ detail.description }}</td>
-                      <td class="text-right">{{ formatMoney(detail.amount_before_tax) }}</td>
-                      <td class="text-right">{{ formatMoney(detail.tax_amount) }}</td>
-                      <td class="text-right font-weight-bold">{{ formatMoney(detail.total_amount) }}</td>
-                      <td>{{ detail.invoice_number || '-' }}</td>
-                    </tr>
-                  </tbody>
-                  <tfoot>
-                    <tr class="bg-light font-weight-bold">
-                      <th colspan="2" class="text-right">TỔNG CỘNG:</th>
-                      <th class="text-right">{{ formatMoney(getTotalBeforeTax) }}</th>
-                      <th class="text-right">{{ formatMoney(getTotalTax) }}</th>
-                      <th class="text-right text-danger">{{ formatMoney(request.amount) }}</th>
-                      <th></th>
-                    </tr>
-                  </tfoot>
-                </table>
+                <div class="table-responsive" v-if="request.details && request.details.length > 0">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th style="width: 40px">STT</th>
+                        <th>Nội dung</th>
+                        <th style="width: 130px">Tiền chưa thuế</th>
+                        <th style="width: 100px">Thuế GTGT</th>
+                        <th style="width: 130px">Tổng tiền</th>
+                        <th style="width: 100px">Số HĐ</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(detail, index) in request.details" :key="detail.id">
+                        <td class="text-center">{{ index + 1 }}</td>
+                        <td>{{ detail.description }}</td>
+                        <td class="text-right">{{ formatMoney(detail.amount_before_tax) }}</td>
+                        <td class="text-right">{{ formatMoney(detail.tax_amount) }}</td>
+                        <td class="text-right font-weight-bold">{{ formatMoney(detail.total_amount) }}</td>
+                        <td>{{ detail.invoice_number || '-' }}</td>
+                      </tr>
+                    </tbody>
+                    <tfoot>
+                      <tr class="bg-light font-weight-bold">
+                        <th colspan="2" class="text-right">TỔNG CỘNG:</th>
+                        <th class="text-right">{{ formatMoney(getTotalBeforeTax) }}</th>
+                        <th class="text-right">{{ formatMoney(getTotalTax) }}</th>
+                        <th class="text-right text-danger">{{ formatMoney(request.amount) }}</th>
+                        <th></th>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
                 <div v-else class="text-center p-4 text-muted">
                   <i class="fas fa-inbox fa-2x mb-2"></i>
                   <p>Không có chi tiết thanh toán</p>
@@ -381,7 +383,7 @@ const formattedUpdateHistories = computed(() => {
               <div class="card-header">
                 <h3 class="card-title">Lịch sử phê duyệt</h3>
               </div>
-              <div class="card-body">
+              <div class="card-body px-0 py-3 sm:p-4">
                 <ApprovalTimeline :histories="request.approval_histories" />
               </div>
             </div>

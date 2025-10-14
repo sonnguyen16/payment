@@ -73,60 +73,64 @@ const deleteVoucher = () => {
         </div>
 
         <!-- Voucher Info -->
-        <div class="card w-50">
-          <div class="card-header">
-            <h3 class="card-title">Thông tin phiếu chi</h3>
-          </div>
-          <div class="card-body">
-            <div class="row">
-              <div class="col-12">
-                <table class="table table-borderless">
-                  <tr>
-                    <th style="width: 150px">Ngày chi:</th>
-                    <td>{{ formatDate(voucher.expense_date) }}</td>
-                  </tr>
-                  <tr>
-                    <th>Danh mục:</th>
-                    <td>
-                      <div class="d-flex align-items-center" v-if="voucher.expense_category">
-                        <div
-                          class="category-indicator mr-2"
-                          :style="{ backgroundColor: voucher.expense_category.color }"
-                        ></div>
-                        {{ voucher.expense_category.name }}
-                      </div>
-                      <span v-else class="text-muted">-</span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>Dự án:</th>
-                    <td>{{ voucher.project?.name || '-' }}</td>
-                  </tr>
-                  <tr>
-                    <th>Số tiền:</th>
-                    <td class="text-primary font-weight-bold">{{ formatMoney(voucher.amount) }}</td>
-                  </tr>
-                  <tr>
-                    <th style="width: 150px">Người nhận:</th>
-                    <td>{{ voucher.recipient }}</td>
-                  </tr>
-                  <tr>
-                    <th>Người tạo:</th>
-                    <td>{{ voucher.user.name }}</td>
-                  </tr>
-                  <tr>
-                    <th>Ngày tạo:</th>
-                    <td>{{ formatDateTime(voucher.created_at) }}</td>
-                  </tr>
-                  <tr>
-                    <th>Cập nhật:</th>
-                    <td>{{ formatDateTime(voucher.updated_at) }}</td>
-                  </tr>
-                  <tr>
-                    <th>Nội dung:</th>
-                    <td>{{ voucher.description }}</td>
-                  </tr>
-                </table>
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Thông tin phiếu chi</h3>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-12">
+                    <table class="table table-borderless">
+                      <tr>
+                        <th style="width: 150px">Ngày chi:</th>
+                        <td>{{ formatDate(voucher.expense_date) }}</td>
+                      </tr>
+                      <tr>
+                        <th>Danh mục:</th>
+                        <td>
+                          <div class="d-flex align-items-center" v-if="voucher.expense_category">
+                            <div
+                              class="category-indicator mr-2"
+                              :style="{ backgroundColor: voucher.expense_category.color }"
+                            ></div>
+                            {{ voucher.expense_category.name }}
+                          </div>
+                          <span v-else class="text-muted">-</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>Dự án:</th>
+                        <td>{{ voucher.project?.name || '-' }}</td>
+                      </tr>
+                      <tr>
+                        <th>Số tiền:</th>
+                        <td class="text-primary font-weight-bold">{{ formatMoney(voucher.amount) }}</td>
+                      </tr>
+                      <tr>
+                        <th style="width: 150px">Người nhận:</th>
+                        <td>{{ voucher.recipient }}</td>
+                      </tr>
+                      <tr>
+                        <th>Người tạo:</th>
+                        <td>{{ voucher.user.name }}</td>
+                      </tr>
+                      <tr>
+                        <th>Ngày tạo:</th>
+                        <td>{{ formatDateTime(voucher.created_at) }}</td>
+                      </tr>
+                      <tr>
+                        <th>Cập nhật:</th>
+                        <td>{{ formatDateTime(voucher.updated_at) }}</td>
+                      </tr>
+                      <tr>
+                        <th>Nội dung:</th>
+                        <td>{{ voucher.description }}</td>
+                      </tr>
+                    </table>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

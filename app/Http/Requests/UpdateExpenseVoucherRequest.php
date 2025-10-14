@@ -28,7 +28,6 @@ class UpdateExpenseVoucherRequest extends FormRequest
             'expense_category_id' => ['required', 'exists:expense_categories,id'],
             'project_id' => ['nullable', 'exists:projects,id'],
             'recipient' => ['required', 'string', 'max:255'],
-            'update_reason' => ['required', 'string', 'max:500'],
         ];
     }
 
@@ -64,11 +63,6 @@ class UpdateExpenseVoucherRequest extends FormRequest
             'recipient.required' => 'Vui lòng nhập người nhận',
             'recipient.string' => 'Người nhận phải là chuỗi ký tự',
             'recipient.max' => 'Người nhận không được quá 255 ký tự',
-            
-            // Update reason
-            'update_reason.required' => 'Vui lòng nhập lý do chỉnh sửa',
-            'update_reason.string' => 'Lý do chỉnh sửa phải là chuỗi ký tự',
-            'update_reason.max' => 'Lý do chỉnh sửa không được quá 500 ký tự',
         ];
     }
 }

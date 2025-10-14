@@ -5,19 +5,21 @@
       <!-- Left navbar links -->
       <ul class="navbar-nav">
         <li class="nav-item block lg:hidden">
-          <a class="nav-link" data-widget="pushmenu" href="#" role="button">
+          <a class="nav-link" id="pushmenu-button" data-widget="pushmenu" href="#" role="button">
             <i class="fas fa-bars"></i>
           </a>
         </li>
         <li class="flex items-center gap-2">
-          <img src="/logo.png" alt="Logo" class="w-10 h-10 ms-3" />
-          <h2 class="text-lg text-gray-500 hidden lg:block">Chấn Hưng Ltd</h2>
+          <Link :href="isAdmin ? route('admin.users.index') : route('dashboard')" class="flex items-center gap-2">
+            <img src="/logo.png" alt="Logo" class="w-10 h-10 ms-3" />
+            <h2 class="text-lg text-gray-500 hidden lg:block">Chấn Hưng Ltd</h2>
+          </Link>
         </li>
       </ul>
 
       <!-- Right navbar links -->
       <ul class="navbar-nav ml-auto">
-        <li class="nav-item">
+        <li class="nav-item hidden sm:block">
           <span class="nav-link">{{ $page.props.auth.user.name }}</span>
         </li>
         <li class="nav-item">
@@ -31,7 +33,7 @@
     <!-- Main Sidebar -->
     <aside class="main-sidebar border-gray-500">
       <!-- Sidebar -->
-      <div class="sidebar sidebar-light">
+      <div class="sidebar bg-white">
         <!-- Sidebar Menu -->
         <nav class="mt-2">
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
@@ -157,17 +159,33 @@
     </div>
 
     <!-- Footer -->
-    <footer class="main-footer">
-      <strong class="text-[12px] md:text-md">Copyright &copy; 2025 Chan Hung Corporation. All Rights Reserved</strong>
+    <footer class="main-footer z-[9999]">
+      <strong class="text-[10px] sm:text-md">Copyright &copy; 2025 Chan Hung Corporation. All Rights Reserved</strong>
     </footer>
   </div>
 </template>
 
 <script setup>
 import { Link, usePage } from '@inertiajs/vue3'
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 
 const page = usePage()
+
+// close sidebar when navigate to another page
+const closeSidebar = () => {
+  // trigger click event on pushmenu button
+  const pushmenuButton = document.querySelector('#pushmenu-button')
+  if (pushmenuButton) {
+    pushmenuButton.click()
+  }
+}
+
+onMounted(() => {
+  // if mobile and sidebar is open, close it
+  if (window.innerWidth < 768 && document.body.classList.contains('sidebar-open')) {
+    closeSidebar()
+  }
+})
 
 const canApprove = computed(() => {
   const user = page.props.auth.user

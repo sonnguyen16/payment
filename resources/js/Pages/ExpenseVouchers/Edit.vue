@@ -14,8 +14,7 @@ const form = useForm({
   amount: props.voucher.amount,
   expense_category_id: props.voucher.expense_category_id,
   project_id: props.voucher.project_id,
-  recipient: props.voucher.recipient,
-  update_reason: ''
+  recipient: props.voucher.recipient
 })
 
 const formatNumber = (value) => {
@@ -145,21 +144,6 @@ const submit = () => {
                     </select>
                     <div v-if="form.errors.expense_category_id" class="invalid-feedback">
                       {{ form.errors.expense_category_id }}
-                    </div>
-                  </div>
-
-                  <!-- Lý do chỉnh sửa -->
-                  <div class="form-group">
-                    <label>Lý do chỉnh sửa <span class="text-danger">*</span></label>
-                    <textarea
-                      v-model="form.update_reason"
-                      class="form-control"
-                      :class="{ 'is-invalid': form.errors.update_reason }"
-                      rows="3"
-                      placeholder="Nhập lý do chỉnh sửa phiếu chi này"
-                    ></textarea>
-                    <div v-if="form.errors.update_reason" class="invalid-feedback">
-                      {{ form.errors.update_reason }}
                     </div>
                   </div>
                 </div>

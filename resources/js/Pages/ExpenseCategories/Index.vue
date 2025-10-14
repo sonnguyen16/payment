@@ -60,7 +60,7 @@ const deleteCategory = (category) => {
         <!-- Filter Toolbar -->
         <div class="card">
           <div class="card-body">
-            <div class="row">
+            <div class="row sm:gap-0 gap-3">
               <div class="col-md-3">
                 <input
                   v-model="search"
@@ -80,7 +80,7 @@ const deleteCategory = (category) => {
               <div class="col-md-5 d-flex gap-3">
                 <button @click="clearFilters" class="btn btn-secondary"><i class="fas fa-times"></i> Xóa bộ lọc</button>
                 <Link :href="route('admin.expense-categories.create')" class="btn btn-primary">
-                  <i class="fas fa-plus"></i> Thêm danh mục chi
+                  <i class="fas fa-plus"></i> Thêm danh mục
                 </Link>
               </div>
             </div>
@@ -132,7 +132,10 @@ const deleteCategory = (category) => {
                         <Link :href="route('admin.expense-categories.show', category.id)" class="btn btn-sm btn-info">
                           <i class="fas fa-eye"></i>
                         </Link>
-                        <Link :href="route('admin.expense-categories.edit', category.id)" class="btn btn-sm btn-warning">
+                        <Link
+                          :href="route('admin.expense-categories.edit', category.id)"
+                          class="btn btn-sm btn-warning"
+                        >
                           <i class="fas fa-edit"></i>
                         </Link>
                         <button

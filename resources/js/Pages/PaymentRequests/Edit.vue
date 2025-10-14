@@ -169,7 +169,7 @@ const submit = () => {
                               :value="formatNumber(detail.amount_before_tax)"
                               @input="handleAmountInput(detail, 'amount_before_tax', $event)"
                               type="text"
-                              class="form-control"
+                              class="form-control text-right"
                               :class="{ 'is-invalid': form.errors[`details.${index}.amount_before_tax`] }"
                               placeholder="0"
                             />
@@ -182,7 +182,7 @@ const submit = () => {
                               :value="formatNumber(detail.tax_amount)"
                               @input="handleAmountInput(detail, 'tax_amount', $event)"
                               type="text"
-                              class="form-control"
+                              class="form-control text-right"
                               placeholder="0"
                             />
                           </td>
@@ -190,7 +190,7 @@ const submit = () => {
                             <input
                               :value="formatNumber(detail.total_amount)"
                               type="text"
-                              class="form-control"
+                              class="form-control text-right"
                               readonly
                             />
                           </td>

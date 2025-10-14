@@ -76,7 +76,7 @@ const printReport = () => {
             <h3 class="card-title">Bộ lọc</h3>
           </div>
           <div class="card-body">
-            <div class="row">
+            <div class="row sm:gap-0 gap-3">
               <div class="col-md-3">
                 <div class="form-group">
                   <label>Từ ngày</label>

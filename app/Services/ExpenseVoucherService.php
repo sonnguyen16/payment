@@ -11,14 +11,14 @@ class ExpenseVoucherService
     {
         return DB::transaction(function () use ($data) {
             $data['user_id'] = auth()->id();
-            
+
             return ExpenseVoucher::create($data);
         });
     }
 
-    public function update(ExpenseVoucher $expenseVoucher, array $data, string $reason): ExpenseVoucher
+    public function update(ExpenseVoucher $expenseVoucher, array $data): ExpenseVoucher
     {
-        return DB::transaction(function () use ($expenseVoucher, $data, $reason) {
+        return DB::transaction(function () use ($expenseVoucher, $data) {
             // Track changes
             $changes = [];
             foreach ($data as $key => $value) {
@@ -29,18 +29,18 @@ class ExpenseVoucherService
                     ];
                 }
             }
-            
+
             $expenseVoucher->update($data);
-            
+
             // Save to update_histories
             if (!empty($changes)) {
                 $expenseVoucher->updateHistories()->create([
                     'user_id' => auth()->id(),
-                    'reason' => $reason,
+                    'reason' => 'Cập nhật phiếu chi',
                     'changes' => json_encode($changes),
                 ]);
             }
-            
+
             return $expenseVoucher;
         });
     }
@@ -57,29 +57,29 @@ class ExpenseVoucherService
         if ($value === null) {
             return 'Trống';
         }
-        
+
         // Format expense_category_id
         if ($field === 'expense_category_id' && $value) {
             $category = \App\Models\ExpenseCategory::find($value);
             return $category ? $category->name : $value;
         }
-        
+
         // Format project_id
         if ($field === 'project_id' && $value) {
             $project = \App\Models\Project::find($value);
             return $project ? $project->name : $value;
         }
-        
+
         // Format date
         if ($field === 'expense_date' && $value) {
             return \Carbon\Carbon::parse($value)->format('d/m/Y');
         }
-        
+
         // Format money
         if ($field === 'amount' && $value) {
             return number_format($value, 0, ',', '.') . ' ₫';
         }
-        
+
         return (string) $value;
     }
 }
