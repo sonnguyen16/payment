@@ -67,7 +67,5 @@ class CategorySeeder extends Seeder
         foreach ($categories as $category) {
             Category::create($category);
         }
-
-        $this->command->info('Categories seeded successfully!');
     }
 }
