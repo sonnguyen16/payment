@@ -123,6 +123,9 @@ class PaymentRequestTestSeeder extends Seeder
             ]);
             $head->assignRole('department_head');
             $deptHeads[$dept->id] = $head;
+            $dept->update([
+                'head_user_id' => $head->id,
+            ]);
         }
 
         // Tạo 8 Nhân viên (2 nhân viên/phòng ban)
