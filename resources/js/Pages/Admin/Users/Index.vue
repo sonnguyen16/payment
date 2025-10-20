@@ -96,7 +96,7 @@ const clearFilters = () => {
                   </option>
                 </select>
               </div>
-              <div class="col-md-3 d-flex gap-3">
+              <div class="col-md-5 d-flex gap-3">
                 <button @click="clearFilters" class="btn btn-secondary"><i class="fas fa-times"></i> Xóa bộ lọc</button>
                 <Link :href="route('admin.users.create')" class="btn btn-primary">
                   <i class="fas fa-plus"></i> Thêm người dùng
